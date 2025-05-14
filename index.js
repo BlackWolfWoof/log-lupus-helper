@@ -1,63 +1,45 @@
-import { ImapFlow } from 'imapflow';
-import { simpleParser } from 'mailparser';
+import { readdir } from 'fs/promises';
+import { fileURLToPath, pathToFileURL } from 'url';
+import path from 'path';
+import { logDebug, logError } from "./src/utils/logger.js";
 
-async function listEmailsFromVRChat() {
-        const client = new ImapFlow({
-        host: process.env["IMAP_IP"],
-        port: process.env["IMAP_PORT"],
-        secure: false,
-        tls: {
-            rejectUnauthorized: false // <-- Allow self-signed certs
-        },
-        auth: {
-            user: process.env["IMAP_UN"],
-            pass: process.env["IMAP_PW"]
-        },
-        logger: false
-    });
+// Get the directory of the current file
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-    try {
-        // Connect and login
-        await client.connect();
-        console.log('Connected to mail server.');
+/**
+ * Recursively loads all JavaScript files from a given directory, except the Discord folder.
+ * @param {string} dirPath - The directory to scan for script files.
+ * @param {string} basePath - The base path to calculate relative paths.
+ */
+async function loadScripts(dirPath, basePath) {
+  try {
+    const files = await readdir(dirPath, { withFileTypes: true });
 
-        // Select and lock the inbox
-        let lock = await client.getMailboxLock('INBOX');
-        try {
-            // Search for all messages from tickets@vrchat.com
-            const messages = await client.search({ from: 'tickets@vrchat.com' });
+    for (const file of files) {
+      const fullPath = path.join(dirPath, file.name);
 
-            if (messages.length === 0) {
-                console.log('No emails found from tickets@vrchat.com');
-            } else {
-                console.log(`Found ${messages.length} emails from tickets@vrchat.com:\n`);
+      // Skip the discord folder since it has a separate handler
+      if (file.isDirectory() && file.name !== 'discord') {
+        await loadScripts(fullPath, basePath);
+      } else if (file.isFile() && file.name.endsWith('.js')) {
+        await import(pathToFileURL(fullPath));
 
-                // Fetch subject and date from each message
-                for await (let msg of client.fetch(messages, { envelope: true, source: true })) {
-                    const subject = msg.envelope.subject || '(No Subject)';
-                    const date = msg.envelope.date;
-                    console.log(`- [${date}] ${subject}`);
-
-                    // Parse email body
-                    const parsed = await simpleParser(msg.source, {
-                        skipImageLinks: true,
-                        skipAttachments: true
-                    });
-                    console.log(parsed.text || '[No plain text]');
-
-                    // Optional: break early
-                    process.exit(0); // Remove or modify if processing all emails
-                }
-            }
-        } finally {
-            lock.release();
-        }
-    } catch (err) {
-        console.error('Error:', err);
-    } finally {
-        await client.logout();
-        console.log('Logged out.');
+        // Get the relative path from the base src directory
+        const relativePath = path.relative(basePath, fullPath).replace(/\\/g, '/');
+        logDebug(`[Main Handler]: ✅ Loaded \x1b[4;37m${relativePath}\x1b[0m`);
+      }
     }
+  } catch (error) {
+    logError(`[Main Handler]: ❌ Error loading scripts from ${dirPath} - ${error.message}`);
+    throw error
+  }
 }
 
-listEmailsFromVRChat();
+// Start loading all scripts from src, except discord (handled separately)
+const scriptsPath = path.join(__dirname, 'src');
+await loadScripts(scriptsPath, scriptsPath);
+
+// Load Discord-specific scripts
+import "./src/discord/handler.js"; // Handles command loading
+import "./src/discord/bot.js";     // Handles bot login
+logDebug("[Main Handler]: ✅ All handlers initialized.");
