@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder } from "discord.js";
+import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { sendBugMessage, getAvatar, getUserGroups, sanitizeText, escapeMarkdown, getCurrentUser, getUser, toTitleCase } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { sanetizeText } from "../../../../lobby-info/src/utils/functions.js";
@@ -14,20 +14,20 @@ const discord = new SlashCommandBuilder()
       .setName('avatar-id')
       .setDescription('ID of the avatar: avtr_a310c385-72f9-4a4b-8ba0-75b05b1317b3')
       .setRequired(true)
-
+  )
   .addStringOption(option =>
-      option.setName('type')
-        .setDescription('Choose a category')
-        .setRequired(true)
-        .addChoices(
-          { name: 'Crasher', value: 'crasher' },
-          { name: 'NSFW', value: 'nsfw' },
-        )
-    ),
+    option.setName('type')
+      .setDescription('Choose a category')
+      .setRequired(true)
+      .addChoices(
+        { name: 'Crasher', value: 'crasher' },
+        { name: 'NSFW', value: 'nsfw' },
+      )
   );
 
 async function execute(interaction) {
   const avatarId = interaction.options.getString('avatar-id');
+  const type = interaction.options.getString('type');
 
   // Check if already in db
   const alreadyExists = await avatarDb.get(avatarId)
@@ -144,47 +144,16 @@ async function execute(interaction) {
   const avatarUpdatedAt = Math.floor(new Date(avatar.updated_at).getTime() / 1000);
   const embedAvi = new EmbedBuilder()
     .setTitle(avatar.name)
+    .setURL(`https://vrchat.com/home/avatar/${avatar.id}?aviId=${avatar.id}`)
     .setImage(avatar.thumbnailImageUrl)
-    .setDescription(escapeMarkdown(avatar.description.slice(0, 2000)))
+    .setDescription(`\`\`\`${avatar.id}\`\`\``)
     .addFields(
+      { name: "Description", value: escapeMarkdown(avatar.description).slice(0, 1024), inline: false },
       { name: "Styles", value: `Primary: ${avatar.styles.primary || "*None*"}, Secondary: ${avatar.styles.secondary || "*None*"}`, inline: false },
       { name: "Date", value: `Created at: <t:${avatarCreatedAt}>\nUpdated at: <t:${avatarUpdatedAt}>`, inline: false },
       { name: "Tags", value: (avatar.tags.length ? avatar.tags.map(t => toTitleCase(t.split("_").pop())).join(", ") : "*None*"), inline: false },
-      { name: "Acknowledgements", value: avatar.acknowledgements ? sanitizeText(escapeMarkdown(avatar.acknowledgements)) : "*None*", inline: false },
+      { name: "Acknowledgements", value: avatar.acknowledgements ? sanitizeText(escapeMarkdown(avatar.acknowledgements)).slice(0, 1024) : "*None*", inline: false },
     )
-
-  const buttonUrlNSFW = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242&tf_360056455174=user_report&tf_1500001445142=${encodeURIComponent(userInfo.displayName)}&tf_subject=[Avatar]%20Crasher%20Avatar%20%22${encodeURIComponent(avatar.name)}%22&tf_description=${encodeURIComponent(`
-Avatar ID: ${avatar.id}
-Avatar Name: ${avatar.name}
-Avatar Owner ID: ${userInfo.id}
-Avatar Owner Name: ${userInfo.displayName}
-
-This is a semi automated report. For issues please contact wolf@blackwolfwoof.com`)}`
-console.log(buttonNSFW)
-  // Button for reporting
-  const buttonNSFW = new ButtonBuilder()
-    .setStyle(ButtonStyle.Link)
-    .setURL()
-
-  const buttonCrasher = new ButtonBuilder()
-    .setStyle(ButtonStyle.Link)
-    .setURL()
-
-  const row = new ActionRowBuilder().addComponents(buttonNSFW)
-  row.addComponents(buttonCrasher)
-
-// https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242&tf_360056455174=user_report&tf_1500001445142=TARGETNAME&tf_subject=[Automatic%20Report]%20Crasher%20Avatar%20%22AVINAME%22&tf_description=
-
-
-// Avatar ID: PLACEHOLDER
-// Avatar Name: PALCEHOLDER
-// Avatar Owner ID: PLACEHOLDER
-// Avatar Owner Name: PLACEHOLDER
-
-
-
-// This is a semi automated report. For issues please contact wolf@blackwolfwoof.com
-
 
   let channel = client.channels.cache.get(process.env["CHANNEL_ID_AVATAR"]);
   if (!channel) channel = await client.channels.fetch(process.env["CHANNEL_ID_AVATAR"]);
@@ -195,10 +164,44 @@ console.log(buttonNSFW)
     const thread = await channel.threads.create({
       name: avatar.name,
       message: {
-        embeds: [ embed, embedAvi ],
-        components: [row]
+        embeds: [embed, embedAvi]
       }
     });
+
+
+    // Prepare buttons including button with post id
+    const buttonUrlNSFW = `http://localhost:3888/vrchat-report?type=${type}&userId=${userInfo.id}&userDisplayName=${userInfo.displayName}&avatarId=${avatar.id}&avatarName=${avatar.name}&channelId=${thread.id}`
+
+    // Button for reporting
+    const buttonReport = new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setURL(buttonUrlNSFW)
+      .setLabel(`Create Ticket`);
+
+    const buttonCloseThread = new ButtonBuilder()
+      .setStyle(ButtonStyle.Danger)
+      .setCustomId(`button-close-post`)
+      .setEmoji(`🗑️`);
+
+    const row = new ActionRowBuilder().addComponents(buttonCloseThread)
+    row.addComponents(buttonReport)
+
+    const starterMessage = await thread.fetchStarterMessage({ force: true })
+
+    // Now you can edit it
+    const edit = await starterMessage.edit({
+      embeds: [embed, embedAvi],
+      components: [row]
+    });
+
+
+    // Save to db
+    await avatarDb.set(avatar.id, {
+      discordChannelId: thread.id,
+      vrc: avatar
+    })
+    await thread.message
+    // Reply to user with OK
     await interaction.editReply({
       content: `✅ Message posted in <#${thread.id}>`,
       flags: MessageFlags.Ephemeral
@@ -207,7 +210,6 @@ console.log(buttonNSFW)
     await sendBugMessage(interaction, true, false)
   }
 
- 
 }
 
 export default { discord, execute };
