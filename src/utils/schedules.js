@@ -1,7 +1,7 @@
 import dotenv from "dotenv"; dotenv.config()
 import { client } from '../discord/bot.js'
 import { checkTermination } from "./terminationChecker.js";
-import { listEmailsFromVRChat } from './mail.js'
+import { processNewEmail } from './mail.js'
 
 async function main () {
   try {
@@ -13,7 +13,6 @@ async function main () {
       // Make sure the discord client is ready as well
       (async () => {
         while (!client.isReady()) await new Promise(res => setTimeout(res, 1000))
-        await listEmailsFromVRChat()
         await checkTermination()
       })();
     }, 1800000); // 30min
@@ -28,8 +27,9 @@ async function main () {
     // Make sure the discord client is ready as well
     (async () => {
       while (!client.isReady()) await new Promise(res => setTimeout(res, 1000))
-      await listEmailsFromVRChat()
+      // await listEmailsFromVRChat()
       await checkTermination() // Run it once
+      await processNewEmail()
     })();
     await main(); // Start loop
 })()

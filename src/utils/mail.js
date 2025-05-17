@@ -6,25 +6,25 @@ import { emailDb } from './quickdb.js'
 import { client as discordClient } from '../discord/bot.js'
 import { convert } from 'html-to-text'
 
-export async function listEmailsFromVRChat() {
-      const client = new ImapFlow({
-      host: process.env["IMAP_IP"],
-      port: process.env["IMAP_PORT"],
-      secure: false,
-      tls: {
-          rejectUnauthorized: false // <-- Allow self-signed certs
-      },
-      auth: {
-          user: process.env["IMAP_UN"],
-          pass: process.env["IMAP_PW"]
-      },
-      logger: false
+const client = new ImapFlow({
+    host: process.env["IMAP_IP"],
+    port: process.env["IMAP_PORT"],
+    secure: false,
+    tls: {
+        rejectUnauthorized: false
+    },
+    auth: {
+        user: process.env["IMAP_UN"],
+        pass: process.env["IMAP_PW"]
+    },
+    logger: false
 });
 
+export async function processNewEmail() {
   try {
     // Connect and login
-    await client.connect();
-    logDebug('[email]: Connected to mail server.');
+    // await client.connect();
+    // logDebug('[email]: Connected to mail server.');
 
     // Select and lock the inbox
     let lock = await client.getMailboxLock('INBOX');
@@ -82,8 +82,35 @@ export async function listEmailsFromVRChat() {
   } catch (err) {
     logError(`[email]: error: ${err}`)
     console.error('Error:', err);
-  } finally {
-    await client.logout();
-    logDebug('[email]: Logged out.');
   }
 }
+
+async function main() {
+    await client.connect();
+    logInfo('[email]: Connected and waiting for new emails...');
+
+    const lock = await client.getMailboxLock('INBOX');
+    lock.release(); // We don’t need to hold the lock after setup
+
+    client.on('exists', async (seq) => {
+        logDebug(`[email]: New email detected.`);
+        await processNewEmail(seq);
+    });
+
+    client.on('error', (err) => {
+        logError(`[email]: IMAP error: ${err}`);
+    });
+
+    client.on('close', () => {
+        logWarn('[email]: Connection closed');
+        // Optional: Implement reconnection logic here
+        main()
+    });
+
+    // Keep alive indefinitely
+    await new Promise(() => {});
+}
+
+main().catch(err => {
+    logError(`[email]: Fatal error: ${err}`);
+});
