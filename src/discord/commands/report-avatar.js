@@ -9,7 +9,7 @@ const discord = new SlashCommandBuilder()
   .setContexts(InteractionContextType.Guild)
   .addStringOption(option =>
     option
-      .setName('avtar-id')
+      .setName('avatar-id')
       .setDescription('ID of the avatar: avtr_a310c385-72f9-4a4b-8ba0-75b05b1317b3')
       .setRequired(true)
   );
