@@ -1418,3 +1418,15 @@ export async function getAvatar(avatarId) {
 export function toTitleCase(str) {
   return str.replace(/\w\S*/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase());
 }
+
+
+export async function findAvatarByChannel(channelId) {
+  const allEntries = await avatarDb.all();
+  for (const entry of allEntries) {
+    if (entry.value && entry.value.discordChannelId === channelId) {
+      return entry;  // Return immediately on first match
+    }
+  }
+
+  return null; // Return null if no match found
+}
