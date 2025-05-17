@@ -177,7 +177,7 @@ async function execute(interaction) {
 
 
     // Prepare buttons including button with post id
-    const buttonUrlNSFW = `https://blackwolfwoof.com/vrchat-report?type=${encodeURIComponent(type)}&userId=${encodeURIComponent(userInfo.id)}&userDisplayName=${userInfo.displayName}&avatarId=${encodeURIComponent(avatar.id)}&avatarName=${encodeURIComponent(avatar.name)}&channelId=${encodeURIComponent(thread.id)}`
+    const buttonUrlNSFW = `https://blackwolfwoof.com/vrchat-report?avatarId=${encodeURIComponent(avatar.id)}`
 
     // Button for reporting
     const buttonReport = new ButtonBuilder()
@@ -205,6 +205,8 @@ async function execute(interaction) {
     // Save to db
     await avatarDb.set(avatar.id, {
       discordChannelId: thread.id,
+      type: 'nsfw',
+      authorDisplayName: userInfo.displayName,
       vrc: avatar
     })
     await thread.message
