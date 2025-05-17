@@ -1506,3 +1506,93 @@ export function getGroupEmoji(groupId) {
 
   return assignedEmoji;
 }
+
+
+/**
+ * Fetches detailed data for a specific avatar from the VRChat API using the given avatar ID.
+ *
+ * This function sends a GET request to `https://api.vrchat.cloud/api/1/avatars/{avatarId}`,
+ * retrieving full metadata about an avatar including author, URLs, tags, and Unity packages.
+ * If the request returns a 401 status code, it attempts to refresh or validate the session via `testSession()`.
+ *
+ * @async
+ * @function getAvatar
+ * @param {string} avatarId - The unique identifier of the avatar (e.g., `avtr_123456789abcdef`).
+ * @returns {Promise<Object>} Resolves to an object containing avatar metadata with the following fields:
+ *
+ * @property {string} assetUrl - URL to the avatar asset bundle.
+ * @property {Object} assetUrlObject - Deprecated. Empty object; use `assetUrl` instead.
+ * @property {string} authorId - ID of the avatar's creator (user ID).
+ * @property {string} authorName - Display name of the avatar's creator.
+ * @property {string} created_at - ISO 8601 timestamp of avatar creation.
+ * @property {string} description - Description of the avatar.
+ * @property {boolean} featured - Whether the avatar is featured.
+ * @property {string} id - Unique avatar ID.
+ * @property {string} imageUrl - URL to the avatar's main image.
+ * @property {string} name - Name of the avatar.
+ * @property {"public"|"private"|"hidden"|"all"} releaseStatus - Visibility status of the avatar.
+ * @property {Object} styles - Style metadata.
+ * @property {string|null} styles.primary
+ * @property {string|null} styles.secondary
+ * @property {string[]} styles.supplementary
+ * @property {string[]} tags - Array of system/admin/author/language tags associated with the avatar.
+ * @property {string} thumbnailImageUrl - URL to the thumbnail image of the avatar.
+ * @property {string} unityPackageUrl - URL to the Unity package for this avatar.
+ * @property {Object} unityPackageUrlObject - Deprecated. Empty object; use `unityPackageUrl` instead.
+ * @property {Object[]} unityPackages - Array of Unity package versions for different platforms.
+ * @property {string} unityPackages[].id - Unity package ID.
+ * @property {string|null} unityPackages[].assetUrl - URL to asset bundle (can be null).
+ * @property {Object} unityPackages[].assetUrlObject - Deprecated. Empty object.
+ * @property {number} unityPackages[].assetVersion - Version number of the asset.
+ * @property {string} unityPackages[].created_at - Timestamp of the package creation.
+ * @property {string} unityPackages[].impostorizerVersion
+ * @property {"None"|"Excellent"|"Good"|"Medium"|"Poor"|"VeryPoor"} unityPackages[].performanceRating
+ * @property {string} unityPackages[].platform - Target platform (e.g., android, standalonewindows).
+ * @property {string} unityPackages[].pluginUrl
+ * @property {Object} unityPackages[].pluginUrlObject - Deprecated. Empty object.
+ * @property {number} unityPackages[].unitySortNumber
+ * @property {string} unityPackages[].unityVersion - Unity version string.
+ * @property {string|null} unityPackages[].worldSignature
+ * @property {string|null} unityPackages[].impostorUrl
+ * @property {string} unityPackages[].scanStatus
+ * @property {string} unityPackages[].variant
+ * @property {string} updated_at - ISO 8601 timestamp of last update.
+ * @property {number} version - Version number of the avatar.
+ *
+ * @throws {Error} If the fetch request fails or the response cannot be parsed as JSON.
+ */
+
+export async function getAvatar(avatarId) {
+  // Fetch new data from API
+  const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/avatars/${avatarId}`, {
+    headers: {
+      "User-Agent": process.env["USERAGENT"],
+      "Cookie": process.env["VRCHAT_TOKEN"]
+    },
+    method: "GET"
+  }, 6)
+
+  let data = await response.json()
+
+  // Check request status
+  switch (response.status) {
+    case 200:
+      // Store in cache
+      break
+    case 401:
+      await testSession()
+      break
+  }
+
+  return data
+}
+
+
+/**
+ * Converts a string to Title Case: first letter of each word capitalized, rest lowercased.
+ * @param {string} str - The input string.
+ * @returns {string} The title-cased string.
+ */
+export function toTitleCase(str) {
+  return str.replace(/\w\S*/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase());
+}
