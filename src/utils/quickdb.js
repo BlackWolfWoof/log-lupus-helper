@@ -15,6 +15,4 @@ const db = new QuickDB({ filePath: dbPath });
 const avatarDb = db.table("avatars")
 const userDb = db.table("users")
 
-await db.set("isLocked", false); // Set lock to false, so on restart it is unlocked
-
 export { avatarDb, userDb };
