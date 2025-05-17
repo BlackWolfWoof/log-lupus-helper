@@ -31,9 +31,9 @@ app.get('/vrchat-report', (req, res) => {
       case "nsfw":
         redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
         `&tf_360056455174=user_report` +
-        `&tf_anonymous_requester_email=${channelId}%2Babusereports%40blackwolfwoof.com` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
         `&tf_1500001445142=${encodeURIComponent(userDisplayName)}` +
-        `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20%22${encodeURIComponent(avatarName)}%22%20is%20missing%20content_sex%20tag` +
+        `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20%22${encodeURIComponent(avatarName)}%22%20is%20missing%20content_sex%20tag%20%28Automated%20${channelId}%29` +
         `&tf_description=${encodeURIComponent(`The Avatar in question has adult features but is missing the content_sex tag. The attachments may include media showcasing the avatar.<br><br>` +
           `Avatar ID: ${avatarId}<br>` +
           `Avatar Name: ${avatarName}<br>` +
@@ -44,7 +44,7 @@ app.get('/vrchat-report', (req, res) => {
       case "crasher":
         redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
         `&tf_360056455174=user_report` +
-        `&tf_anonymous_requester_email=${channelId}%2Babusereports%40blackwolfwoof.com` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
         `&tf_1500001445142=${encodeURIComponent(userDisplayName)}` +
         `&tf_subject=%5BAvatar%5D%20Crasher%20Avatar%20%22${encodeURIComponent(avatarName)}%22%20%28Automated%20${channelId}%29` +
         `&tf_description=${encodeURIComponent(`The Avatar in question disrupts the gameplay by crashing/lagging the client of the users. The attachments may include media showcasing the avatar.<br><br>` +
