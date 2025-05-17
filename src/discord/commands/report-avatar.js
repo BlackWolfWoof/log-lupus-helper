@@ -54,6 +54,14 @@ async function execute(interaction) {
     return
   }
 
+  if (type === "nsfw" && Array.isArray(avatar.tags) && avatar.tags.includes("content_sex")) {
+    await interaction.editReply({
+      content: `❌ The avatar is marked as NSFW and can therefor not be reported for being NSFW.`,
+      flags: MessageFlags.Ephemeral
+    })
+    return
+  }
+
 
   const userInfo = await getUser(avatar.authorId);
   const userGroups = await getUserGroups(avatar.authorId);
