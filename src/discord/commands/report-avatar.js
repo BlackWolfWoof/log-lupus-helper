@@ -1,6 +1,8 @@
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder } from "discord.js";
 import { sendBugMessage, } from '../../utils/functions.js';
 import { client } from '../bot.js'
+import { sanetizeText } from "../../../../lobby-info/src/utils/functions.js";
+import { userDb, avatarDb } from '../../utils/quickdb.js'
 
 const discord = new SlashCommandBuilder()
   .setName("report-avatar")
@@ -26,6 +28,16 @@ const discord = new SlashCommandBuilder()
 
 async function execute(interaction) {
   const avatarId = interaction.options.getString('avatar-id');
+
+  // Check if already in db
+  const alreadyExists = await avatarDb.get(avatarId)
+  if (alreadyExists) {
+    await interaction.reply({
+      content: `❌ The avatar is already tracked in <#${alreadyExists.discordChannelId}>`,
+      flags: MessageFlags.Ephemeral
+    })
+    return
+  }
 
   await interaction.deferReply({ flags: MessageFlags.Ephemeral }) // Preventing timeouts of the command
 
