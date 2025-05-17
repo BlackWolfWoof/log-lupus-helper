@@ -30,7 +30,7 @@ client.once('ready', async () => {
     await rest.put(Routes.applicationCommands(client.user.id), { body: msgCommands })
 
     // Set bot status
-    client.user.setActivity('VRChat Groups', { type: ActivityType.Watching })
+    // client.user.setActivity('VRChat Groups', { type: ActivityType.Watching })
 
     logInfo(`[Discord]: ✅ Client is ready: ${client.user.username}`)  
   } catch (error) {
