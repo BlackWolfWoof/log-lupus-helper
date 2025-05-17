@@ -5,7 +5,7 @@ import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { flushCache, hasCache, deleteCache, getCache, setCache } from './cache.js'
 import dotenv from "dotenv"; dotenv.config()
 import { PermissionsBitField, ChannelType } from 'discord.js'
-import { db } from './quickdb.js'
+import { userDb, avatarDb } from './quickdb.js'
 import { MessageFlags } from 'discord.js'
 
 const wait = ms => new Promise(res => setTimeout(res, ms));
@@ -897,144 +897,6 @@ export const createChannels = async (guild, category) => {
 };
 
 
-/**
- * Updates the guild's database entry with a new VRC group.
- * @param {string} guildId - The ID of the Discord guild.
- * @param {string} vrcGroupId - The ID of the VRC group.
- * @param {object} channels - Object containing channel names and their IDs.
- */
-export async function updateGuildConfig(guildId, vrcGroupId, channels) {
-  // Fetch the existing guild data from the database
-  await dbLock();
-  const linkedGuilds = (await db.get("linked-guilds")) || {};
-  
-  // Ensure guildData is an object (not an array)
-  let guildData = linkedGuilds[guildId] || {};
-
-  // Ensure it's an object (handle cases where the data might be corrupted)
-  if (typeof guildData !== "object" || Array.isArray(guildData)) {
-      guildData = {};
-  }
-
-  // Update or add the VRC group entry
-  guildData[vrcGroupId] = { channels };
-
-  // Save the updated data back to the database
-  linkedGuilds[guildId] = guildData;
-  await db.set("linked-guilds", linkedGuilds);
-  await dbUnlock();
-}
-
-
-/**
- * Checks if a specific guild has a given VRC group ID in its configuration.
- * @param {string} guildId - The ID of the Discord guild.
- * @param {string} vrcGroupId - The VRC group ID to check.
- * @returns {Promise<boolean>} - Returns true if the group exists, otherwise false.
- */
-export async function serverHasVrcGroup(guildId, vrcGroupId) {
-  // Fetch the existing guild data
-  await dbLock();
-  const linkedGuilds = (await db.get("linked-guilds")) || {};
-  await dbUnlock();
-
-  // Ensure guildData is an object (not an array)
-  const guildData = linkedGuilds[guildId] || {};
-
-  // Check if the group ID exists in the guild's object
-  return typeof guildData === "object" && !Array.isArray(guildData) && vrcGroupId in guildData;
-}
-
-/**
- * Funny implementation to prevent data loss in the database. It works, ok?
- * Call before accessing the database, even if it is just a simple read and no write operation.
- */
-export async function dbLock() {
-  // Check if database is locked and wait
-  let isLocked = await db.get("isLocked")
-  while (isLocked) {
-      await wait(50)
-      isLocked = await db.get("isLocked")
-  }
-  await db.set("isLocked", true) // Lock database
-}
-
-/**
- * Funny implementation to prevent data loss in the database. It works, ok?
- * Call to release the database again
- */
-export async function dbUnlock() {
-  await db.set("isLocked", false) // Lock database
-}
-
-
-export async function processAuditLogs(guildId, vrcGroupId, channels, lastGaud) {
-  logDebug(`[Group Log Parser]: ${guildId} Processing logs for ${vrcGroupId}`);
-
-  // Pagination settings
-  let amount = lastGaud ? 100 : 60; // Fetch 100 logs if last-gaud exists
-  let offset = 0;
-  let maxLogs = 100; // Limit total fetched logs
-  let allLogs = [];
-  let fetchMore = true;
-  let latestGaud = null; // Store the latest gaud ID
-
-  while (fetchMore && allLogs.length < maxLogs) {
-    try {
-      // Fetch logs
-      const response = await getGroupLog(vrcGroupId, amount, offset);
-      if (response.error && response.error.message == "You're not a member․") {
-        await dbLock()
-        let linkedGuilds = (await db.get("linked-guilds")) || {};
-        let guildData = linkedGuilds[guildId] || {};
-        delete guildData[vrcGroupId]
-        linkedGuilds[guildId] = guildData
-        if (linkedGuilds[guildId].length) {
-          delete linkedGuilds[guildId]
-          logWarn(`[Group Log Parser]: ${guildId} Guild config empty, deleting guild settings.`)
-        }
-        await db.set("linked-guilds", linkedGuilds);
-        await dbUnlock()
-        logWarn(`[Group Log Parser]: ${guildId} Service account no longer member of group ${vrcGroupId}, disconnecting logging on discord.`)
-        throw response.error
-      }
-      const auditLogs = response.results;
-
-      if (auditLogs.length === 0) break; // Stop if no logs found
-
-      // Set latestGaud if it's the first batch (i.e., the most recent log)
-      if (!latestGaud) {
-        latestGaud = auditLogs[0].id;
-      }
-
-      allLogs = [...allLogs, ...auditLogs];
-
-      // If last-gaud exists, stop fetching once we reach it (EXCLUDE that log and everything after)
-      const foundIndex = lastGaud ? allLogs.findIndex(log => log.id === lastGaud) : -1;
-      if (foundIndex !== -1) {
-        logDebug(`[Group Log Parser]: ${guildId} Found last-gaud for ${vrcGroupId} (${lastGaud}) in logs. Logs up to date.`);
-        allLogs = allLogs.slice(0, foundIndex); // Only keep new logs (EXCLUDING the first duplicate)
-        fetchMore = false;
-      }
-
-      // Stop fetching if this was the last page
-      if (!response.hasNext) {
-        logDebug(`[Group Log Parser]: ${guildId} Reached the last page of logs for ${vrcGroupId}.`);
-        break;
-      }
-
-      offset += amount; // Move to next batch
-    } catch (error) {
-      logWarn(`[Group Log Parser]: ${guildId} Error fetching logs for ${vrcGroupId}: ${error.message}`);
-      console.log(error)
-      break;
-    }
-  }
-  logDebug(`[Group Log Parser]: ${guildId} Retrieved ${allLogs.length} new logs for ${vrcGroupId}. New last-gaud: ${latestGaud || lastGaud}`);
-
-  return { allLogs, lastGaud: latestGaud || lastGaud }; // Return only unique new logs and updated lastGaud
-}
-
 
 /**
  * Retrieves the audit log for a specific VRChat group.
@@ -1428,46 +1290,6 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
 
 //   return data;
 // }
-
-
-/**
- * Checks whether the invoking Discord user has a VRChat account linked.
- * 
- * @async
- * @function ensureUserLinked
- * @param {import('discord.js').CommandInteraction} interaction - The interaction object from Discord.
- * @returns {Promise<array>} Returns an array of VRChat userId's.
- */
-export async function ensureUserLinked(interaction) {
-  await dbLock();
-  const linkedUsers = (await db.get("linked-users")) || {};
-  await dbUnlock();
-
-  const userDb = linkedUsers[interaction.user.id] || { vrcUserIds: [] };
-
-  return userDb;
-}
-
-
-/**
- * Ensures that the invoking guild (Discord server) is linked in the database.
- * 
- * Checks the database for the guild's link information and returns it. If the guild is not found, it returns an empty object.
- * 
- * @async
- * @function ensureGroupLinked
- * @param {import('discord.js').CommandInteraction} interaction - The interaction object from Discord.
- * @returns {Promise<Object>} The guild's linked information, or an empty object if no link exists.
- */
-export async function ensureGroupLinked(interaction) {
-  await dbLock();
-  const linkedGuilds = (await db.get("linked-guilds")) || {};
-  await dbUnlock();
-
-  const guildDb = linkedGuilds[interaction.guild.id] || {};
-
-  return guildDb
-}
 
 
 // Predefined list of animal emojis
