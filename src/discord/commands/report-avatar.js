@@ -12,6 +12,16 @@ const discord = new SlashCommandBuilder()
       .setName('avatar-id')
       .setDescription('ID of the avatar: avtr_a310c385-72f9-4a4b-8ba0-75b05b1317b3')
       .setRequired(true)
+
+  .addStringOption(option =>
+      option.setName('type')
+        .setDescription('Choose a category')
+        .setRequired(true)
+        .addChoices(
+          { name: 'Crasher', value: 'crasher' },
+          { name: 'NSFW', value: 'nsfw' },
+        )
+    ),
   );
 
 async function execute(interaction) {
