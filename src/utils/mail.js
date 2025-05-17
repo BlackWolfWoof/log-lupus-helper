@@ -30,11 +30,11 @@ export async function listEmailsFromVRChat() {
     let lock = await client.getMailboxLock('INBOX');
     try {
       // Search for all messages from tickets@vrchat.com
-      const messages = await client.search({ from: 'tickets@vrchat.com' });
+      const messages = await client.search({ from: 'tickets@vrchat.com', to: 'abusereports@blackwolfwoof.com' });
       if (messages.length === 0) {
         logDebug('[email]: No emails found from tickets@vrchat.com');
       } else {
-        logDebug(`[email]: Found ${messages.length} emails from tickets@vrchat.com:`);
+        logDebug(`[email]: Found ${messages.length} emails from tickets@vrchat.com to abusereports@blackwolfwoof.com`);
 
         // Fetch subject and date from each message
         for await (let msg of client.fetch(messages, { envelope: true, source: true })) {
@@ -43,10 +43,10 @@ export async function listEmailsFromVRChat() {
           const recipients = msg.envelope.to.map(to => to.address).join(', ');
           // console.log(`[email]: [${date}] To: ${recipients} | Subject: ${subject}`);
           
-          // Check if the email starts with 1373252475909574708+abusereports@blackwolfwoof.com to only include automated reports
-          const regex = /^(\d{19})\+abusereports@blackwolfwoof\.com$/;
+          // Check if the email starts with abusereports@blackwolfwoof.com to only include automated reports
+          const regex = /\(Automated (\d{19})\) #\d+$/;
 
-          const match = regex.exec(recipients);
+          const match = regex.exec(msg.envelope.subject);
           if (match) {
             // Extract the 19-digit number from capture group 1
             const channelId = match[1];
