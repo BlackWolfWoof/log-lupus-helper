@@ -13,8 +13,12 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
       - protonmail-bridge
+      - caddy
 
 networks:
   protonmail-bridge:
     name: protonmail-bridge
+    external: true
+  caddy:
+    name: caddy
     external: true

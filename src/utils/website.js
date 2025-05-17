@@ -46,7 +46,7 @@ app.get('/vrchat-report', (req, res) => {
         `&tf_360056455174=user_report` +
         `&tf_anonymous_requester_email=${channelId}%2Babusereports%40blackwolfwoof.com` +
         `&tf_1500001445142=${encodeURIComponent(userDisplayName)}` +
-        `&tf_subject=%5BAvatar%5D%20Crasher%20Avatar%20%22${encodeURIComponent(avatarName)}%22` +
+        `&tf_subject=%5BAvatar%5D%20Crasher%20Avatar%20%22${encodeURIComponent(avatarName)}%22%20%28Automated%20${channelId}%29` +
         `&tf_description=${encodeURIComponent(`The Avatar in question disrupts the gameplay by crashing/lagging the client of the users. The attachments may include media showcasing the avatar.<br><br>` +
           `Avatar ID: ${avatarId}<br>` +
           `Avatar Name: ${avatarName}<br>` +
