@@ -31,12 +31,13 @@ app.get('/vrchat-report', (req, res) => {
       `&tf_360056455174=user_report` +
       `&tf_anonymous_requester_email=${channelId}+abusereports%40blackwolfwoof.com` +
       `&tf_1500001445142=${encodeURIComponent(userDisplayName)}` +
-      `&tf_subject=%5BAvatar%5D%20Crasher%20Avatar%20%22${encodeURIComponent(avatarName)}%22` +
-      `&tf_description=${encodeURIComponent(`Avatar ID: ${avatarId}\n` +
-        `Avatar Name: ${avatarName}\n` +
-        `Avatar Owner ID: ${userId}\n` +
-        `Avatar Owner Name: ${userDisplayName}\n\n` +
-        `This is a semi automated report. For issues please contact wolf@blackwolfwoof.com`)}`;
+      `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20missing%20content_sex%20tag%22${encodeURIComponent(avatarName)}%22` +
+      `&tf_description=${encodeURIComponent(`The Avatar in question has adult features but is missing the content_sex tag. The attachments may include media showcasing the avatar.<br>`
+        `Avatar ID: ${avatarId}<br>` +
+        `Avatar Name: ${avatarName}<br>` +
+        `Avatar Owner ID: ${userId}<br>` +
+        `Avatar Owner Name: ${userDisplayName}<br><br>` +
+        `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
       break
     default:
       return res.status(400).send({
