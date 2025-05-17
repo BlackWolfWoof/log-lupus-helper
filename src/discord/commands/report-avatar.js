@@ -177,7 +177,7 @@ async function execute(interaction) {
 
 
     // Prepare buttons including button with post id
-    const buttonUrlNSFW = `https://blackwolfwoof.com/vrchat-report?avatarId=${encodeURIComponent(avatar.id)}`
+    const buttonUrlNSFW = `https://blackwolfwoof.com/vrchat-report?channelId=${encodeURIComponent(thread.id)}`
 
     // Button for reporting
     const buttonReport = new ButtonBuilder()
