@@ -16,7 +16,7 @@ async function main () {
         await listEmailsFromVRChat()
         await checkTermination()
       })();
-    }, 60000); // 1h
+    }, 1800000); // 30min
 
   } catch (e) {
     logError(`[schedules]: Fatal error that crashed the loop. Restarting loops. Error: ${e}`)
