@@ -191,12 +191,13 @@ console.log(buttonNSFW)
 
 
   if (channel) {
-    console.log(interaction)
+    // Create form thread
     const thread = await channel.threads.create({
-      name: `Test ${interaction.id}`,
+      name: avatar.name,
       message: {
-        content: `Hello world ${avatarId}`
-      },
+        embeds: [ embed, embedAvi ],
+        components: [row]
+      }
     });
     await interaction.editReply({
       content: `✅ Message posted in <#${thread.id}>`,
