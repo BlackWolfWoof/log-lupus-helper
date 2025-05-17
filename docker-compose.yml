@@ -1,0 +1,13 @@
+services:
+  log-lupus-helper:
+    container_name: log-lupus-helper
+    image: log-lupus-helper
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+    - ./json.sqlite:/app/json.sqlite
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
