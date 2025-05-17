@@ -157,7 +157,7 @@ async function execute(interaction) {
     .addFields(
       { name: "Description", value: escapeMarkdown(avatar.description).slice(0, 1024), inline: false },
       { name: "Styles", value: `Primary: ${avatar.styles.primary || "*None*"}, Secondary: ${avatar.styles.secondary || "*None*"}`, inline: false },
-      { name: "Date", value: `Created at: <t:${avatarCreatedAt}>\nUpdated at: <t:${avatarUpdatedAt}>`, inline: false },
+      { name: "Date", value: `Created at: <t:${avatarCreatedAt}> (<t:${avatarUpdatedAt}:R>)\nUpdated at: <t:${avatarUpdatedAt}:R> (<t:${avatarUpdatedAt}>)`, inline: false },
       { name: "Tags", value: (avatar.tags.length ? avatar.tags.map(t => toTitleCase(t.split("_").pop())).join(", ") : "*None*"), inline: false },
       { name: "Acknowledgements", value: avatar.acknowledgements ? sanitizeText(escapeMarkdown(avatar.acknowledgements)).slice(0, 1024) : "*None*", inline: false },
     )
