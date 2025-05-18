@@ -1,11 +1,11 @@
 import { client } from '../../bot.js'
 import { MessageFlags } from 'discord.js';
 import { avatarDb } from '../../../utils/quickdb.js'
-import { findAvatarByChannel } from '../../../utils/functions.js';
+import { findChannelId } from '../../../utils/functions.js';
 
 async function execute(interaction) {
   const thread = interaction.channel
-  const avatar = await findAvatarByChannel(interaction.channel.id)
+  const avatar = await findChannelId(interaction.channel.id)
 
   // Archive the thread
   try {
