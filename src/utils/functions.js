@@ -1430,3 +1430,8 @@ export async function findAvatarByChannel(channelId) {
 
   return null; // Return null if no match found
 }
+
+
+export async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
