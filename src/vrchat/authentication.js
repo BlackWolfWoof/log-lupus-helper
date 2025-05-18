@@ -63,10 +63,10 @@ async function getAuthTOTP(auth, totpCode) {
  * @param {string} auth - Auth token.
  * @param {string} twoFactorAuth - Two-factor authentication token.
  */
-async function saveCredentials(auth, twoFactorAuth) {
+async function saveCredentials(auth) {
   try {
     let data = await fs.readFile(".env", "utf-8")
-    data = data.replace(/VRCHAT_TOKEN=.*/, `VRCHAT_TOKEN="auth=${auth}; twoFactorAuth=${twoFactorAuth}"`) // Update token
+    data = data.replace(/VRCHAT_TOKEN=.*/, `VRCHAT_TOKEN=auth=${auth}`) // Update token
     await fs.writeFile(".env", data)
     logDebug(`[Auth]: Credentials saved successfully.`)
   } catch (err) {
