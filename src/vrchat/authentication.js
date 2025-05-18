@@ -61,7 +61,6 @@ async function getAuthTOTP(auth, totpCode) {
 /**
  * Save updated credentials to the `.env` file.
  * @param {string} auth - Auth token.
- * @param {string} twoFactorAuth - Two-factor authentication token.
  */
 async function saveCredentials(auth) {
   try {
