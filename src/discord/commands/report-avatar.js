@@ -178,12 +178,12 @@ async function execute(interaction) {
 
 
     // Prepare buttons including button with post id
-    const buttonUrlNSFW = `https://blackwolfwoof.com/vrchat-report?channelId=${encodeURIComponent(thread.id)}`
+    const buttonUrl = `https://blackwolfwoof.com/vrchat-report?channelId=${encodeURIComponent(thread.id)}`
 
     // Button for reporting
     const buttonReport = new ButtonBuilder()
       .setStyle(ButtonStyle.Link)
-      .setURL(buttonUrlNSFW)
+      .setURL(buttonUrl)
       .setLabel(`Create Ticket`);
 
     const buttonCloseThread = new ButtonBuilder()
