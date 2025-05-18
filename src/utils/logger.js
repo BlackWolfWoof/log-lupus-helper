@@ -1,5 +1,4 @@
-// Handles the print to console part
-import dotenv from "dotenv"; dotenv.config();
+import './loadEnv.js'
 import { WebhookClient } from "discord.js";
 import { client } from '../discord/bot.js'
 import fs from "fs";

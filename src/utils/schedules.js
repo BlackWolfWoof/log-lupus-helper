@@ -1,4 +1,3 @@
-import dotenv from "dotenv"; dotenv.config()
 import { client } from '../discord/bot.js'
 import { checkTermination } from "./terminationChecker.js";
 import { processNewEmail } from './mail.js'

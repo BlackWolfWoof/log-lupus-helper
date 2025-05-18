@@ -127,7 +127,8 @@ async function authInvalid() {
       logInfo(`[Auth]: Success. Saving credentials...`)
       await saveCredentials(auth, twoFactorAuth)
 
-      reloadEnv() // Reload the updated credentials
+      dotenv.config() // Reload the updated credentials
+      logInfo(`[Auth]: 🔄️ Reloaded env vars`)
       return // Exit the function if successful
     } catch (error) {
       logError(`[Auth]: Login attempt ${attempts + 1} failed: ${error.message}`)

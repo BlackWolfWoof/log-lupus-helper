@@ -1,7 +1,7 @@
+import './loadEnv.js'
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
-import dotenv from "dotenv"; dotenv.config()
 import { emailDb } from './quickdb.js'
 import { client as discordClient } from '../discord/bot.js'
 import { convert } from 'html-to-text'

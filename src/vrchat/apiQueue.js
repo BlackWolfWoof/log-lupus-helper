@@ -1,3 +1,4 @@
+import '../utils/loadEnv.js'
 import { logDebug, logInfo, logWarn, logError } from '../utils/logger.js';
 import dotenv from "dotenv"; dotenv.config();
 

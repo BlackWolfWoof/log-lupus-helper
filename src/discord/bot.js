@@ -1,7 +1,7 @@
+import '../utils/loadEnv.js'
 import { Client, GatewayIntentBits, REST, Routes, ActivityType, MessageFlags, ChannelType } from 'discord.js'
 import { logDebug, logInfo, logWarn, logError } from '../utils/logger.js'
 import { commands, interactions, loadDiscordCommands, loadInteractions } from './handler.js'
-import dotenv from "dotenv"; dotenv.config()
 import { webhookClient, getFormattedTime } from '../utils/logger.js'
 
 

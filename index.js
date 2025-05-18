@@ -1,3 +1,4 @@
+import './src/utils/loadEnv.js'
 import { readdir } from 'fs/promises';
 import { fileURLToPath, pathToFileURL } from 'url';
 import path from 'path';
