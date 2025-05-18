@@ -5,6 +5,7 @@ import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { emailDb } from './quickdb.js'
 import { client as discordClient } from '../discord/bot.js'
 import { convert } from 'html-to-text'
+import { sleep } from './functions.js'
 
 const client = new ImapFlow({
     host: process.env["IMAP_IP"],
@@ -85,32 +86,39 @@ export async function processNewEmail() {
   }
 }
 
-async function main() {
-    await client.connect();
-    logInfo('[email]: Connected and waiting for new emails...');
+export async function emailConnection() {
+  while (true) {
+    try {
+      await client.connect();
+      logInfo('[email]: Connected and waiting for new emails...');
 
-    const lock = await client.getMailboxLock('INBOX');
-    lock.release(); // We don’t need to hold the lock after setup
+      // Immediately release mailbox lock to trigger exists listener properly
+      const lock = await client.getMailboxLock('INBOX');
+      lock.release();
 
-    client.on('exists', async (seq) => {
+      client.on('exists', async (seq) => {
         logDebug(`[email]: New email detected.`);
         await processNewEmail(seq);
-    });
+      });
 
-    client.on('error', (err) => {
+      client.on('error', (err) => {
         logError(`[email]: IMAP error: ${err}`);
-    });
+      });
 
-    client.on('close', () => {
-        logWarn('[email]: Connection closed');
-        // Optional: Implement reconnection logic here
-        main()
-    });
+      client.on('close', async () => {
+        logWarn('[email]: Connection closed, will retry in 10 minutes...');
+        await sleep(600000); // 10 minutes
+      });
 
-    // Keep alive indefinitely
-    await new Promise(() => {});
+      // Prevent main from exiting
+      await new Promise(() => {});
+
+    } catch (error) {
+      await client.logout();
+      logError(`[email]: Fatal error in emailConnection(): ${error}`);
+      console.error(error);
+      logInfo('[email]: Retrying connection in 10 minutes...');
+      await sleep(600000); // 10 minutes delay before retry
+    }
+  }
 }
-
-main().catch(err => {
-    logError(`[email]: Fatal error: ${err}`);
-});

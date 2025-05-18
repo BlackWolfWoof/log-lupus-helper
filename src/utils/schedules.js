@@ -1,6 +1,6 @@
 import { client } from '../discord/bot.js'
 import { checkTermination } from "./terminationChecker.js";
-import { processNewEmail } from './mail.js'
+import { emailConnection } from './mail.js'
 
 async function main () {
   try {
@@ -28,7 +28,7 @@ async function main () {
       while (!client.isReady()) await new Promise(res => setTimeout(res, 1000))
       // await listEmailsFromVRChat()
       await checkTermination() // Run it once
-      await processNewEmail()
+      await emailConnection()
     })();
     await main(); // Start loop
 })()
