@@ -1,6 +1,6 @@
 import express from 'express';
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
-import { findAvatarByChannel } from './functions.js'
+import { findChannelId, sanitizeText } from './functions.js'
 
 const app = express();
 const port = 3888;
@@ -17,7 +17,7 @@ app.get('/vrchat-report', async (req, res) => {
         }
       });
     }
-    const avatar = await findAvatarByChannel(channelId)
+    const avatar = await findChannelId(channelId)
     if (!avatar) {
       return res.status(401).send({
         error: {

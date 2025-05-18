@@ -1420,15 +1420,24 @@ export function toTitleCase(str) {
 }
 
 
-export async function findAvatarByChannel(channelId) {
-  const allEntries = await avatarDb.all();
-  for (const entry of allEntries) {
+export async function findChannelId(channelId) {
+  // Check avatarDb
+  const avatarEntries = await avatarDb.all();
+  for (const entry of avatarEntries) {
     if (entry.value && entry.value.discordChannelId === channelId) {
-      return entry;  // Return immediately on first match
+      return entry;
     }
   }
 
-  return null; // Return null if no match found
+  // Check userDb
+  const userEntries = await userDb.all();
+  for (const entry of userEntries) {
+    if (entry.value && entry.value.discordChannelId === channelId) {
+      return entry;
+    }
+  }
+
+  return null;
 }
 
 
