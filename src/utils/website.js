@@ -56,6 +56,39 @@ app.get('/vrchat-report', async (req, res) => {
           `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
           `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
         break
+      case "user-racism":
+        redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
+        `&tf_360056455174=user_report` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
+        `&tf_1500001445142=${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}` +
+        `&tf_subject=%5BUser%5D%20Racist%20user%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
+        `&tf_description=${encodeURIComponent(`The user in question is using offensive/racist language. The attachments may include media showcasing the users behaviour.<br><br>` +
+          `Offending User ID: ${entry.id}<br>` +
+          `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
+          `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+        break
+      case "user-nsfw":
+        redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
+        `&tf_360056455174=user_report` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
+        `&tf_1500001445142=${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}` +
+        `&tf_subject=%5BUser%5D%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20uses%20adult%20avatar%20in%20public;%20User%20%20%28Automated%20${channelId}%29` +
+        `&tf_description=${encodeURIComponent(`The user in question is using an avatar with adult features in a none age gated instance. The avatar itself is properly tagged as content_sex. The attachments may include media showcasing the users behaviour.<br><br>` +
+          `Offending User ID: ${entry.id}<br>` +
+          `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
+          `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+        break
+      case "user-child":
+        redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
+        `&tf_360056455174=user_report` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
+        `&tf_1500001445142=${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}` +
+        `&tf_subject=%5BUser%5D%20Underage%20user%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
+        `&tf_description=${encodeURIComponent(`The user in question is under the legal age of 13 to play VRChat. The attachments may include media showcasing the users behaviour and voice as well as other evidence.<br><br>` +
+          `Offending User ID: ${entry.id}<br>` +
+          `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
+          `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+        break
       default:
         return res.status(400).send({
           "error": {
