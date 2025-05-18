@@ -206,7 +206,7 @@ async function execute(interaction) {
     // Save to db
     await avatarDb.set(avatar.id, {
       discordChannelId: thread.id,
-      type: 'nsfw',
+      type: type,
       authorDisplayName: userInfo.displayName,
       vrc: avatar
     })
