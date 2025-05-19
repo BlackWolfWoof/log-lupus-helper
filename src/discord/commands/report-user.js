@@ -139,7 +139,7 @@ async function execute(interaction) {
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(sanitizeText(userInfo?.displayName))
+    .setTitle(sanitizeText(escapeMarkdown(userInfo?.displayName)))
     .setDescription(`\`\`\`${userInfo.id}\`\`\``)
     .setURL(`https://vrchat.com/home/user/${userInfo.id}`)
     .setImage(profilePic)

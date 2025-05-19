@@ -130,7 +130,7 @@ async function execute(interaction) {
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(sanitizeText(userInfo?.displayName))
+    .setTitle(sanitizeText(escapeMarkdown(userInfo?.displayName)))
     .setDescription(`\`\`\`${userInfo.id}\`\`\``)
     .setURL(`https://vrchat.com/home/user/${userInfo.id}`)
     .setImage(profilePic)
@@ -151,7 +151,7 @@ async function execute(interaction) {
   const avatarCreatedAt = Math.floor(new Date(avatar.created_at).getTime() / 1000);
   const avatarUpdatedAt = Math.floor(new Date(avatar.updated_at).getTime() / 1000);
   const embedAvi = new EmbedBuilder()
-    .setTitle(avatar.name)
+    .setTitle(sanitizeText(escapeMarkdown(avatar.name)))
     .setURL(`https://vrchat.com/home/avatar/${avatar.id}?aviId=${avatar.id}`)
     .setImage(avatar.thumbnailImageUrl)
     .setDescription(`\`\`\`${avatar.id}\`\`\``)
