@@ -2,10 +2,10 @@ import './loadEnv.js'
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
-import { emailDb } from './quickdb.js'
+import { emailDb, avatarDb, userDb } from './quickdb.js'
 import { client as discordClient } from '../discord/bot.js'
 import { convert } from 'html-to-text'
-import { sleep } from './functions.js'
+import { findChannelId, sleep } from './functions.js'
 
 const client = new ImapFlow({
     host: process.env["IMAP_IP"],
@@ -61,15 +61,23 @@ export async function processNewEmail() {
                 skipAttachments: true
               });
 
-              let thread = discordClient.channels.cache.get(channelId);
-              if (!thread) thread = await discordClient.channels.fetch(channelId);
-              if (thread.archived) {
+              try {
+                let thread = discordClient.channels.cache.get(channelId);
+                if (!thread) thread = await discordClient.channels.fetch(channelId);
+                if (thread.archived) thread.setArchived(false)
+                // Send email in thread
+                await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
                 await emailDb.set(msg.id, 0)
-                continue
-              } 
-              // Send email in thread
-              await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
-              await emailDb.set(msg.id, 0)
+              } catch (error) {
+                // Delete the entry as the channel no longer exists and i cannot send a message to it anymore
+                // Figure out if it is a userDb or avatarDb entry
+                const entry = findChannelId(channelId)
+                if (entry.id.includes('usr_')) {
+                  await userDb.delete(entry.id)
+                } else if (entry.id.includes('avtr_')) {
+                  await avatarDb.delete(entry.id)
+                }
+              }
             }
           }
         }
