@@ -7,6 +7,7 @@ import { flushCache, hasCache, deleteCache, getCache, setCache } from './cache.j
 import { PermissionsBitField, ChannelType } from 'discord.js'
 import { userDb, avatarDb } from './quickdb.js'
 import { MessageFlags } from 'discord.js'
+import crypto from 'crypto';
 
 const wait = ms => new Promise(res => setTimeout(res, ms));
 
@@ -1443,4 +1444,18 @@ export async function findChannelId(channelId) {
 
 export async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Generates a SHA-256 hash from the provided input string.
+ *
+ * @param {string} input - The input string to be hashed.
+ * @returns {string} The SHA-256 hash of the input string in hexadecimal format.
+ *
+ * @example
+ * const hash = sha256Hash('hello world');
+ * console.log(hash); // Output: a948904f2f0f479b8f8197694b30184b0d2ed1c1...
+ */
+export function sha256Hash(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
 }

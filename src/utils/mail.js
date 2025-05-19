@@ -5,7 +5,7 @@ import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { emailDb, avatarDb, userDb } from './quickdb.js'
 import { client as discordClient } from '../discord/bot.js'
 import { convert } from 'html-to-text'
-import { findChannelId, sleep } from './functions.js'
+import { findChannelId, sleep, sha256Hash } from './functions.js'
 
 const client = new ImapFlow({
     host: process.env["IMAP_IP"],
@@ -28,7 +28,7 @@ export async function processNewEmail() {
     // logDebug('[email]: Connected to mail server.');
 
     // Select and lock the inbox
-    let lock = await client.getMailboxLock('INBOX');
+    let lock = await client.getMailboxLock('Archive'); //INBOX
     try {
       // Search for all messages from tickets@vrchat.com
       const messages = await client.search({ from: 'tickets@vrchat.com', to: 'abusereports@blackwolfwoof.com' });
@@ -53,7 +53,8 @@ export async function processNewEmail() {
             const channelId = match[1];
 
             // Check the email id against the db and skip if already known
-            const skipEmail = await emailDb.has(msg.id);
+            const emailHash = sha256Hash(`${msg.envelope.date}-${msg.envelope.subject}`)
+            const skipEmail = await emailDb.has(emailHash)
             if (!skipEmail) {
               // Parse email body
               const parsed = await simpleParser(msg.source, {
@@ -67,12 +68,12 @@ export async function processNewEmail() {
                 if (thread.archived) thread.setArchived(false)
                 // Send email in thread
                 await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
-                await emailDb.set(msg.id, 0)
+                await emailDb.set(emailHash, 0)
               } catch (error) {
                 // Delete the entry as the channel no longer exists and i cannot send a message to it anymore
                 // Figure out if it is a userDb or avatarDb entry
                 const entry = findChannelId(channelId)
-                if (entry.id.includes('usr_')) {
+                if (entry?.id && entry.id.includes('usr_')) {
                   await userDb.delete(entry.id)
                 } else if (entry.id.includes('avtr_')) {
                   await avatarDb.delete(entry.id)
@@ -101,12 +102,12 @@ export async function emailConnection() {
       logInfo('[email]: Connected and waiting for new emails...');
 
       // Immediately release mailbox lock to trigger exists listener properly
-      const lock = await client.getMailboxLock('INBOX');
+      const lock = await client.getMailboxLock('Archive'); // INBOX
       lock.release();
-
+      await processNewEmail()
       client.on('exists', async (seq) => {
         logDebug(`[email]: New email detected.`);
-        await processNewEmail(seq);
+        await processNewEmail();
       });
 
       client.on('error', (err) => {
