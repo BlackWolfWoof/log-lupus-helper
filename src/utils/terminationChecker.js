@@ -113,14 +113,22 @@ export async function checkTermination() {
         logWarn(`[terminationChecker]: Channel no longer exists but is still in db. Removing userDb entry.`)
         await userDb.delete(entry.id)
       }
-      
+
+      const submitter = entry.value.submitter ? `<@${entry.value.submitter}>` : null
 
       if (refreshedUser.error && refreshedUser.error.status_code === 404) {
         // Unexpected error, remove from db and kill thread. Add function for this to terminate the watching
         logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} user went missing`)
 
         if (thread.isArchived) await thread.setArchived(false)
-        await thread.send(`💀 The user does not exist anymore.\nTherefor the thread is no longer tracked and is archivd.`)
+        const embed = new EmbedBuilder()
+          .setTitle('💀User deleted')
+          .setDescription(`The user does not exist anymore.\nTherefor the thread is no longer tracked and is archivd.`)
+          .setColor(0x000000);
+        await thread.send({
+          content: submitter,
+          embeds: [embed]
+        })
         await thread.setArchived(true, `Archived automatically (user NA)`);
         await userDb.delete(entry.id)
         // Delete from db and close thread
@@ -133,8 +141,14 @@ export async function checkTermination() {
         logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} user is termed/banned`)
         // Delete from db and close thread
 
-        
-        await thread.send(`🛡️ The user was most likely terminated.\nTherefor the thread is no longer tracked and is archivd.`)
+        const embed = new EmbedBuilder()
+          .setTitle('🛡️User Terminated')
+          .setDescription(`The user was most likely terminated.\nTherefor the thread is no longer tracked and is archivd.`)
+          .setColor(0xFF0000);
+        await thread.send({
+          content: submitter,
+          embeds: [embed]
+        })
         await thread.setArchived(true, `Archived automatically (user term)`);
         await userDb.delete(entry.id)
 
