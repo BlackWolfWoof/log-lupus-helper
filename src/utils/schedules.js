@@ -27,8 +27,8 @@ async function main () {
     (async () => {
       while (!client.isReady()) await new Promise(res => setTimeout(res, 1000))
       // await listEmailsFromVRChat()
+      emailConnection()
       await checkTermination() // Run it once
-      await emailConnection()
     })();
     await main(); // Start loop
 })()
