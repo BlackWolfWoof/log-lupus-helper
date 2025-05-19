@@ -1,6 +1,6 @@
 import { client } from '../../bot.js'
 import { MessageFlags } from 'discord.js';
-import { avatarDb } from '../../../utils/quickdb.js'
+import { avatarDb, userDb } from '../../../utils/quickdb.js'
 import { findChannelId } from '../../../utils/functions.js';
 
 async function execute(interaction) {

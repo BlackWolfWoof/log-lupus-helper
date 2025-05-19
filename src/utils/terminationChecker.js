@@ -26,6 +26,7 @@ export async function checkTermination() {
         } catch (error) {
           logWarn(`[terminationChecker]: Channel no longer exists but is still in db. Removing avatarDb entry.`)
           await avatarDb.delete(entry.id)
+          continue
         }
 
         // Ping user that submitted
@@ -112,6 +113,7 @@ export async function checkTermination() {
       } catch (error) {
         logWarn(`[terminationChecker]: Channel no longer exists but is still in db. Removing userDb entry.`)
         await userDb.delete(entry.id)
+        continue
       }
 
       const submitter = entry.value.submitter ? `<@${entry.value.submitter}>` : null
