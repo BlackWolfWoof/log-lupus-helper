@@ -22,6 +22,8 @@ const discord = new SlashCommandBuilder()
       .addChoices(
         { name: 'Crasher', value: 'avatar-crasher' },
         { name: 'NSFW', value: 'avatar-nsfw' },
+        { name: 'Racist', value: 'avatar-racist' },
+        { name: 'Other reason', value: 'avatar-other' },
       )
   );
 

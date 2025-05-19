@@ -23,7 +23,8 @@ const discord = new SlashCommandBuilder()
         { name: 'Racist', value: 'user-racism' },
         { name: 'NSFW avatar in public', value: 'user-nsfw' },
         { name: 'Underage', value: 'user-child' },
-        { name: 'Pedophile', value: 'user-pedo' }
+        { name: 'Pedophile', value: 'user-pedo' },
+        { name: 'Other reason', value: 'user-other' }
       )
   );
 
