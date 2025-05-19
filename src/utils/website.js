@@ -30,7 +30,9 @@ app.get('/vrchat-report', async (req, res) => {
     let redirectUrl;
 
     switch (entry.value.type) {
-      case "nsfw":
+
+      // Avatar
+      case "avatar-nsfw":
         redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
         `&tf_360056455174=user_report` +
         `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
@@ -43,7 +45,7 @@ app.get('/vrchat-report', async (req, res) => {
           `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
           `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
         break
-      case "crasher":
+      case "avatar-crasher":
         redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
         `&tf_360056455174=user_report` +
         `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +

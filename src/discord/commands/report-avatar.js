@@ -20,8 +20,8 @@ const discord = new SlashCommandBuilder()
       .setDescription('Choose a category')
       .setRequired(true)
       .addChoices(
-        { name: 'Crasher', value: 'crasher' },
-        { name: 'NSFW', value: 'nsfw' },
+        { name: 'Crasher', value: 'avatar-crasher' },
+        { name: 'NSFW', value: 'avatar-nsfw' },
       )
   );
 
