@@ -201,6 +201,7 @@ async function execute(interaction) {
     await userDb.set(userId, {
       discordChannelId: thread.id,
       type: type,
+      submitter: interaction.user.id,
       vrc: userInfo
     })
     await thread.message

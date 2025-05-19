@@ -2,6 +2,7 @@ import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { avatarDb, userDb } from './quickdb.js'
 import { findChannelId, getAvatar, getUser } from './functions.js'
 import { client } from '../discord/bot.js'
+import { EmbedBuilder } from 'discord.js'
 
 export async function checkTermination() {
   // Get all avatars
@@ -27,12 +28,24 @@ export async function checkTermination() {
           await avatarDb.delete(entry.id)
         }
 
+        // Ping user that submitted
+        const submitter = entry.value.submitter ? `<@${entry.value.submitter}>` : null
+
         if (targetUser.error && targetUser.error.status_code === 404) {
           // Unexpected error, remove from db and kill thread. Add function for this to terminate the watching
           logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} has been deleted and user went missing`)
 
           if (thread.isArchived) await thread.setArchived(false)
-          await thread.send(`💀 The user does not exist anymore, and the avatar has been deleted / set to private.\nTherefor the thread is no longer tracked and is archivd.`)
+
+          const embed = new EmbedBuilder()
+            .setTitle('💀User deleted & Avatar terminated')
+            .setDescription(`The user does not exist anymore, and the avatar has been deleted / set to private.\nTherefor the thread is no longer tracked and is archivd.`)
+            .setColor(0x000000);
+          await thread.send({
+            content: submitter,
+            embeds: [embed]
+          })
+
           await thread.setArchived(true, `Archived automatically (user NA)`);
           await avatarDb.delete(entry.id)
           // Delete from db and close thread
@@ -46,7 +59,15 @@ export async function checkTermination() {
           // Delete from db and close thread
 
           if (thread.isArchived) await thread.setArchived(false)
-          await thread.send(`🛡️ The user was most likely terminated, and the avatar has been deleted / set to private.\nTherefor the thread is no longer tracked and is archivd.`)
+          
+          const embed = new EmbedBuilder()
+            .setTitle('🛡️User & Avatar terminated')
+            .setDescription(`The user was most likely terminated and the avatar has been deleted / set to private.\nTherefor the thread is no longer tracked and is archivd.`)
+            .setColor(0xFF0000);
+          await thread.send({
+            content: submitter,
+            embeds: [embed]
+          })
           await thread.setArchived(true, `Archived automatically (user term)`);
           await avatarDb.delete(entry.id)
 
@@ -57,7 +78,15 @@ export async function checkTermination() {
           // Delete from db and close thread
 
           if (thread.isArchived) await thread.setArchived(false)
-          await thread.send(`❔ The user was not terminated, but the avatar has been deleted / set to private.\nTherefor the thread is no longer tracked and is archivd.`)
+
+          const embed = new EmbedBuilder()
+            .setTitle('❔User not deleted & Avatar terminated')
+            .setDescription(`❔The user was not terminated, but the avatar has been deleted / set to private.\nTherefor the thread is no longer tracked and is archivd.`)
+            .setColor(0xFF6C00);
+          await thread.send({
+            content: submitter,
+            embeds: [embed]
+          })
           await thread.setArchived(true, `Archived automatically (avi term)`);
           await avatarDb.delete(entry.id)
 

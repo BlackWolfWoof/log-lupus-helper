@@ -208,6 +208,7 @@ async function execute(interaction) {
       discordChannelId: thread.id,
       type: type,
       authorDisplayName: userInfo.displayName,
+      submitter: interaction.user.id,
       vrc: avatar
     })
     await thread.message
