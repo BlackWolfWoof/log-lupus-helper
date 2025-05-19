@@ -58,6 +58,8 @@ app.get('/vrchat-report', async (req, res) => {
           `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
           `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
         break
+
+      // User
       case "user-racism":
         redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
         `&tf_360056455174=user_report` +
@@ -87,6 +89,17 @@ app.get('/vrchat-report', async (req, res) => {
         `&tf_1500001445142=${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}` +
         `&tf_subject=%5BUser%5D%20Underage%20user%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
         `&tf_description=${encodeURIComponent(`The user in question is under the legal age of 13 to play VRChat. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
+          `Offending User ID: ${entry.id}<br>` +
+          `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
+          `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+        break
+      case "user-pedo":
+        redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
+        `&tf_360056455174=user_report` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
+        `&tf_1500001445142=${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}` +
+        `&tf_subject=%5BUser%5D%20Pedophelia%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
+        `&tf_description=${encodeURIComponent(`I encountered a user exhibiting predatory behavior toward minors in VRChat. They made inappropriate comments and attempted to engage in grooming behavior. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
           `Offending User ID: ${entry.id}<br>` +
           `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
           `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
