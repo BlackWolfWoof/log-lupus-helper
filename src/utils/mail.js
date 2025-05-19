@@ -72,7 +72,7 @@ export async function processNewEmail() {
               } catch (error) {
                 // Delete the entry as the channel no longer exists and i cannot send a message to it anymore
                 // Figure out if it is a userDb or avatarDb entry
-                const entry = findChannelId(channelId)
+                const entry = await findChannelId(channelId)
                 if (entry?.id && entry.id.includes('usr_')) {
                   await userDb.delete(entry.id)
                 } else if (entry.id.includes('avtr_')) {

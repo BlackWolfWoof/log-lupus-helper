@@ -9,9 +9,14 @@ async function execute(interaction) {
 
   // Archive the thread
   try {
-    await avatarDb.delete(avatar.id)
+     const entry = await findChannelId(interaction.channel.id)
+    if (entry?.id && entry.id.includes('usr_')) {
+      await userDb.delete(entry.id)
+    } else if (entry.id.includes('avtr_')) {
+      await avatarDb.delete(entry.id)
+    }
     await interaction.reply({
-      content: `✅ Thread has been archived and the avatar is no longer tracked.`,
+      content: `✅ Thread has been archived will no longer be tracked.`,
       flags: MessageFlags.Ephemeral
     });
     await thread.setArchived(true, `Archived via button by ${interaction.user.id}`);
