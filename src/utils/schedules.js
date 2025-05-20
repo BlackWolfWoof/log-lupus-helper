@@ -1,6 +1,8 @@
 import { client } from '../discord/bot.js'
 import { checkTermination } from "./terminationChecker.js";
 import { emailConnection } from './mail.js'
+import { userDb, avatarDb, countDb } from './quickdb.js'
+import { logDebug, logInfo, logWarn, logError } from './logger.js'
 
 async function main () {
   try {
@@ -13,6 +15,44 @@ async function main () {
       (async () => {
         while (!client.isReady()) await new Promise(res => setTimeout(res, 1000))
         await checkTermination()
+        
+        try {
+          // Edit channel with stats
+          let channelUser = client.channels.cache.get(process.env["CHANNEL_ID_USER"]);
+          if (!channelUser) channelUser = await client.channels.fetch(channelId);
+          let channelAvatar = client.channels.cache.get(process.env["CHANNEL_ID_AVATAR"]);
+          if (!channelAvatar) channelAvatar = await client.channels.fetch(channelId);
+
+          // Get all entries from channel channelUser and channelAvatar
+          const allUsers = await userDb.all()
+          const allAvatars = await avatarDb.all()
+          const countAll = await countDb.all()
+
+          // Calc
+          let userTotal = 0;
+          let avatarTotal = 0;
+
+          for (const entry of countAll) {
+              if (typeof entry.value !== 'number') continue;
+
+              if (entry.id.startsWith('user-')) {
+                  userTotal += entry.value;
+              } else if (entry.id.startsWith('avatar-')) {
+                  avatarTotal += entry.value;
+              }
+          }
+
+
+          // Channel topic
+          const sharedMessage = `# Use the \`/report-user\` and \`/report-avatar\` command to create form posts.\n\n### Tracked:\n- Users: \`${allUsers.length}\`\n- Avatars: \`${allAvatars.length}\`\n### Terminated:\n- Terminated users: \`${userTotal}\`\n- Terminated avatars: \`${avatarTotal}\``
+
+          await channelUser.setTopic(sharedMessage)
+          await channelAvatar.setTopic(sharedMessage)
+        } catch (error) {
+          logError(`[schedules]: Something crashed when calculating the stats. ${error}`)
+          console.error(error)
+        }
+
       })();
     }, 1800000); // 30min
 

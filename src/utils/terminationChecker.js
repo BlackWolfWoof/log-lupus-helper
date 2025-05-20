@@ -1,5 +1,5 @@
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
-import { avatarDb, userDb } from './quickdb.js'
+import { avatarDb, userDb, countDb } from './quickdb.js'
 import { findChannelId, getAvatar, getUser } from './functions.js'
 import { client } from '../discord/bot.js'
 import { EmbedBuilder } from 'discord.js'
@@ -48,6 +48,7 @@ export async function checkTermination() {
           })
 
           await thread.setArchived(true, `Archived automatically (user NA)`);
+          await countDb.add(entry.value.type, 1)
           await avatarDb.delete(entry.id)
           // Delete from db and close thread
 
@@ -60,7 +61,7 @@ export async function checkTermination() {
           // Delete from db and close thread
 
           if (thread.isArchived) await thread.setArchived(false)
-          
+
           const embed = new EmbedBuilder()
             .setTitle('🛡️User & Avatar terminated')
             .setDescription(`The user was most likely terminated and the avatar has been deleted / set to private.\nTherefor the thread is no longer tracked and is archivd.`)
@@ -70,6 +71,7 @@ export async function checkTermination() {
             embeds: [embed]
           })
           await thread.setArchived(true, `Archived automatically (user term)`);
+          await countDb.add(entry.value.type, 1)
           await avatarDb.delete(entry.id)
 
           continue
@@ -120,7 +122,7 @@ export async function checkTermination() {
 
       if (refreshedUser.error && refreshedUser.error.status_code === 404) {
         // Unexpected error, remove from db and kill thread. Add function for this to terminate the watching
-        logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} user went missing`)
+        logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.displayName} user went missing`)
 
         if (thread.isArchived) await thread.setArchived(false)
         const embed = new EmbedBuilder()
@@ -132,6 +134,7 @@ export async function checkTermination() {
           embeds: [embed]
         })
         await thread.setArchived(true, `Archived automatically (user NA)`);
+        await countDb.add(entry.value.type, 1)
         await userDb.delete(entry.id)
         // Delete from db and close thread
 
@@ -140,7 +143,7 @@ export async function checkTermination() {
       if (refreshedUser.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
         // User is maybe terminated.
         // For now, report this instantly, no grace period
-        logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} user is termed/banned`)
+        logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.displayName} user is termed/banned`)
         // Delete from db and close thread
 
         const embed = new EmbedBuilder()
@@ -152,6 +155,7 @@ export async function checkTermination() {
           embeds: [embed]
         })
         await thread.setArchived(true, `Archived automatically (user term)`);
+        await countDb.add(entry.value.type, 1)
         await userDb.delete(entry.id)
 
         continue

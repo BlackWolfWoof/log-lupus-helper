@@ -15,5 +15,6 @@ const db = new QuickDB({ filePath: dbPath });
 const avatarDb = db.table("avatars")
 const userDb = db.table("users")
 const emailDb = db.table("emails")
+const countDb = db.table("count")
 
-export { avatarDb, userDb, emailDb };
+export { avatarDb, userDb, emailDb, countDb };
