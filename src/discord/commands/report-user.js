@@ -24,6 +24,7 @@ const discord = new SlashCommandBuilder()
         { name: 'NSFW avatar in public', value: 'user-nsfw' },
         { name: 'Underage', value: 'user-child' },
         { name: 'Pedophile', value: 'user-pedo' },
+        { name: 'Bad Sticker/Print', value: 'user-media' },
         { name: 'Other reason', value: 'user-other' }
       )
   );
