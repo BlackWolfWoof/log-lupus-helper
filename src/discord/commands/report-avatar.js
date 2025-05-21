@@ -138,6 +138,7 @@ async function execute(interaction) {
     .setImage(profilePic)
     .addFields(
       { name: "📰 Status", value: status, inline: false },
+      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.pronouns), inline: false },
       { name: "📜 Bio", value: bio.length > 1024 ? bio.slice(0, 1021) + "..." : bio, inline: false },
       { name: "🧑‍🦲 Age Verification", value: ageIcon, inline: false },
       { name: "📅 Joined VRChat", value: joinedTimestamp, inline: false },
