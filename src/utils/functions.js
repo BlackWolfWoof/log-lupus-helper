@@ -1459,3 +1459,60 @@ export async function sleep(ms) {
 export function sha256Hash(input) {
   return crypto.createHash('sha256').update(input).digest('hex');
 }
+
+
+const trustColors = {
+  untrusted: "#CCCCCC",
+  basic: "#1778FF",
+  known: "#2BCF5C",
+  trusted: "#FF7B42",
+  veteran: "#B18FFF",
+  vip: "#FF2626",
+  troll: "#782F2F"
+};
+
+const trustRanks = {
+  system_trust_basic: "New User",
+  system_trust_known: "User",
+  system_trust_trusted: "Known User",
+  system_trust_veteran: "Trusted User",
+  admin_moderator: "VIP",
+  system_troll: "Nuisance",
+  system_probable_troll: "Almost Nuisance"
+};
+
+// Enhanced trust level function
+export const getUserTrustLevel = (user) => {
+  let trustColor = trustColors.untrusted;
+  let trustRank = "Visitor";
+
+  const tags = user?.tags || [];
+
+  if (tags.includes("admin_moderator")) {
+    trustColor = trustColors.vip;
+    trustRank = trustRanks.admin_moderator;
+  } else if (tags.includes("system_troll")) {
+    trustColor = trustColors.troll;
+    trustRank = trustRanks.system_troll;
+  } else if (tags.includes("system_probable_troll")) {
+    trustColor = trustColors.troll;
+    trustRank = trustRanks.system_probable_troll;
+  } else if (tags.includes("system_trust_veteran")) {
+    trustColor = trustColors.veteran;
+    trustRank = trustRanks.system_trust_veteran;
+  } else if (tags.includes("system_trust_trusted")) {
+    trustColor = trustColors.trusted;
+    trustRank = trustRanks.system_trust_trusted;
+  } else if (tags.includes("system_trust_known")) {
+    trustColor = trustColors.known;
+    trustRank = trustRanks.system_trust_known;
+  } else if (tags.includes("system_trust_basic")) {
+    trustColor = trustColors.basic;
+    trustRank = trustRanks.system_trust_basic;
+  }
+
+  return {
+    trustColor,
+    trustRank
+  };
+};

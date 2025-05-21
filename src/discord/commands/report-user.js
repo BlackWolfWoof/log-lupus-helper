@@ -1,6 +1,6 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, getAvatar, getUserGroups, sanitizeText, escapeMarkdown, getCurrentUser, getUser, toTitleCase } from '../../utils/functions.js';
+import { sendBugMessage, getAvatar, getUserGroups, sanitizeText, escapeMarkdown, getCurrentUser, getUser, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
 
@@ -145,6 +145,7 @@ async function execute(interaction) {
     .setTitle(sanitizeText(escapeMarkdown(userInfo?.displayName)))
     .setDescription(`\`\`\`${userInfo.id}\`\`\``)
     .setURL(`https://vrchat.com/home/user/${userInfo.id}`)
+    .setColor(getUserTrustLevel(userInfo).trustColor)
     .setImage(profilePic)
     .addFields(
       { name: "📰 Status", value: status, inline: false },
