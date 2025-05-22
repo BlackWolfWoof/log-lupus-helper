@@ -207,7 +207,8 @@ async function execute(interaction) {
       discordChannelId: thread.id,
       type: type,
       submitter: interaction.user.id,
-      vrc: userInfo
+      vrc: userInfo,
+      ticket: false
     })
     await thread.message
     // Reply to user with OK

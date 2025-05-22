@@ -213,7 +213,8 @@ async function execute(interaction) {
       type: type,
       authorDisplayName: userInfo.displayName,
       submitter: interaction.user.id,
-      vrc: avatar
+      vrc: avatar,
+      ticket: false
     })
     await thread.message
     // Reply to user with OK
