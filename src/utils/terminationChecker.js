@@ -46,7 +46,9 @@ export async function checkTermination() {
             content: submitter,
             embeds: [embed]
           })
-
+          await thread.edit({
+            appliedTags: [process.env["DISCORD_TERM_TAG_ID"]]
+          })
           await thread.setArchived(true, `Archived automatically (user NA)`);
           await countDb.add(entry.value.type, 1)
           await avatarDb.delete(entry.id)
@@ -70,6 +72,9 @@ export async function checkTermination() {
             content: submitter,
             embeds: [embed]
           })
+          await thread.edit({
+            appliedTags: [process.env["DISCORD_TERM_TAG_ID"]]
+          })
           await thread.setArchived(true, `Archived automatically (user term)`);
           await countDb.add(entry.value.type, 1)
           await avatarDb.delete(entry.id)
@@ -89,6 +94,9 @@ export async function checkTermination() {
           await thread.send({
             content: submitter,
             embeds: [embed]
+          })
+          await thread.edit({
+            appliedTags: [process.env["DISCORD_TERM_TAG_ID"]]
           })
           await thread.setArchived(true, `Archived automatically (avi term)`);
           await avatarDb.delete(entry.id)
@@ -133,6 +141,9 @@ export async function checkTermination() {
           content: submitter,
           embeds: [embed]
         })
+        await thread.edit({
+          appliedTags: [process.env["DISCORD_TERM_TAG_ID"]]
+        })
         await thread.setArchived(true, `Archived automatically (user NA)`);
         await countDb.add(entry.value.type, 1)
         await userDb.delete(entry.id)
@@ -153,6 +164,9 @@ export async function checkTermination() {
         await thread.send({
           content: submitter,
           embeds: [embed]
+        })
+        await thread.edit({
+          appliedTags: [process.env["DISCORD_TERM_TAG_ID"]]
         })
         await thread.setArchived(true, `Archived automatically (user term)`);
         await countDb.add(entry.value.type, 1)

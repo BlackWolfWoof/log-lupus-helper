@@ -32,6 +32,7 @@ async function main () {
           let userTotal = 0;
           let avatarTotal = 0;
 
+          // Count for avatar and user total
           for (const entry of countAll) {
               if (typeof entry.value !== 'number') continue;
 
@@ -43,8 +44,23 @@ async function main () {
           }
 
 
+          // Count for open tickets. Resolved and not resolved
+          let ticketsOpenUser = 0;
+          let ticketsOpenAvatar = 0;
+          for (entry of allUsers) {
+            if (entry.value.ticket) {
+              ticketsOpenUser++
+            }
+          }
+          for (entry of allAvatars) {
+            if (entry.value.ticket) {
+              ticketsOpenAvatar++
+            }
+          }
+
+
           // Channel topic
-          const sharedMessage = `# Use the \`/report-user\` and \`/report-avatar\` command to create form posts.\n\n### Tracked:\n- Users: \`${allUsers.length}\`\n- Avatars: \`${allAvatars.length}\`\n### Terminated:\n- Terminated users: \`${userTotal}\`\n- Terminated avatars: \`${avatarTotal}\``
+          const sharedMessage = `# Use the \`/report-user\` and \`/report-avatar\` command to create form posts.\n\n### Total tracked: ${allUsers.length + allAvatars.length} ### Tracked:\n- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\`\n- 🖼️Avatars: \`${allAvatars.length}\` 👤\`${ticketsOpenAvatar}\`\n### Terminated:\n- Terminated users: \`${userTotal}\`\n- Terminated avatars: \`${avatarTotal}\``
 
           await channelUser.setTopic(sharedMessage)
           await channelAvatar.setTopic(sharedMessage)

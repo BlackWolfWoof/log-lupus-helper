@@ -68,6 +68,9 @@ export async function processNewEmail() {
                 if (thread.archived) thread.setArchived(false)
                 // Send email in thread
                 await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
+                await thread.edit({
+                  appliedTags: Array.from(new Set([...thread.appliedTags, process.env["DISCORD_TICKET_TAG_ID"]])) // Only add tag, don't remove all other tags
+                })
                 await emailDb.set(emailHash, 0)
               } catch (error) {
                 // Delete the entry as the channel no longer exists and i cannot send a message to it anymore
