@@ -47,7 +47,7 @@ export async function checkTermination() {
             embeds: [embed]
           })
           await thread.edit({
-            appliedTags: [process.env["DISCORD_TERM_TAG_ID"]]
+            appliedTags: [process.env["DISCORD_AVATAR_TERM_TAG_ID"]]
           })
           await thread.setArchived(true, `Archived automatically (user NA)`);
           await countDb.add(entry.value.type, 1)
@@ -73,7 +73,7 @@ export async function checkTermination() {
             embeds: [embed]
           })
           await thread.edit({
-            appliedTags: [process.env["DISCORD_TERM_TAG_ID"]]
+            appliedTags: [process.env["DISCORD_USER_TERM_TAG_ID"]]
           })
           await thread.setArchived(true, `Archived automatically (user term)`);
           await countDb.add(entry.value.type, 1)

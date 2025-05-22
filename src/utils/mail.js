@@ -69,7 +69,7 @@ export async function processNewEmail() {
                 // Send email in thread
                 await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
                 await thread.edit({
-                  appliedTags: Array.from(new Set([...thread.appliedTags, process.env["DISCORD_TICKET_TAG_ID"]])) // Only add tag, don't remove all other tags
+                  appliedTags: Array.from(new Set([...thread.appliedTags, process.env["DISCORD_USER_TICKET_TAG_ID"], process.env["DISCORD_AVATAR_TICKET_TAG_ID"]])) // Only add tag, don't remove all other tags
                 })
                 await emailDb.set(emailHash, 0)
               } catch (error) {
