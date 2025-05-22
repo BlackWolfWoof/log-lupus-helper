@@ -25,6 +25,8 @@ const discord = new SlashCommandBuilder()
         { name: 'Underage', value: 'user-child' },
         { name: 'Pedophile', value: 'user-pedo' },
         { name: 'Bad Sticker/Print', value: 'user-media' },
+        { name: 'Promoting Selfharm', value: 'user-selfharm' },
+        { name: 'Bad Username', value: 'user-badusername' },
         { name: 'Other reason', value: 'user-other' }
       )
   );

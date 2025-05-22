@@ -141,6 +141,28 @@ app.get('/vrchat-report', async (req, res) => {
           `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
           `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
         break
+      case "user-badusername":
+        redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
+        `&tf_360056455174=user_report` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
+        `&tf_1500001445142=${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}` +
+        `&tf_subject=%5BUser%5D%20Bad%20Username%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
+        `&tf_description=${encodeURIComponent(`I encountered a user with a bad username. This username contains offensive and inappropriate content, including references that violate community standards.<br><br>` +
+          `Offending User ID: ${entry.id}<br>` +
+          `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
+          `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+        break
+      case "user-selfharm":
+        redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
+        `&tf_360056455174=user_report` +
+        `&tf_anonymous_requester_email=abusereports%40blackwolfwoof.com` +
+        `&tf_1500001445142=${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}` +
+        `&tf_subject=%5BUser%5D%20Threats%20%2F%20Promoting%20Self-Harm%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
+        `&tf_description=${encodeURIComponent(`I encountered a user threataning or promoting self-harm. The attachments may include media showcasing the users and voice as well as other evidence.<br><br>` +
+          `Offending User ID: ${entry.id}<br>` +
+          `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
+          `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+        break
       case "user-other":
         redirectUrl = `https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=1500000182242` +
         `&tf_360056455174=user_report` +
