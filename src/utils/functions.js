@@ -1516,3 +1516,60 @@ export const getUserTrustLevel = (user) => {
     trustRank
   };
 };
+
+
+
+export async function addTicket(entry, emailHash) {
+  // Determine which DB to use
+  const db = entry.id.startsWith("usr_") ? userDb :
+              entry.id.startsWith("avtr_") ? avatarDb : null;
+
+  if (!db) {
+    logError(`[db]: Invalid entry ID format`)
+    return;
+  }
+
+  // Fetch the existing entry
+  const data = await db.get(entry.id);
+  if (!data) {
+    logError(`[db]: Entry not found`)
+    return;
+  }
+
+  // Ensure ticket is an array
+  const oldTickets = Array.isArray(data.tickets) ? data.tickets : [];
+
+  // Combine with new emailHash
+  const newTickets = [...oldTickets, emailHash];
+
+  // Update and save
+  data.tickets = newTickets;
+  await db.set(entry.id, data);
+
+  logDebug(`[db]: Ticket added to db sucsesfully`)
+}
+
+
+
+export async function isTicketHashUsed(emailHash) {
+    // Helper to search in a specific DB
+    async function searchInDb(db) {
+        const allEntries = await db.all();
+        for (const entry of allEntries) {
+            const tickets = entry.value.tickets;
+            if (Array.isArray(tickets) && tickets.includes(emailHash)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Check both DBs
+    const inUserDb = await searchInDb(userDb);
+    if (inUserDb) return true;
+
+    const inAvatarDb = await searchInDb(avatarDb);
+    if (inAvatarDb) return true;
+
+    return false;
+}
