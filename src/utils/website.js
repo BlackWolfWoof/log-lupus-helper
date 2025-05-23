@@ -1,6 +1,6 @@
 import express from 'express';
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
-import { findChannelId, sanitizeText } from './functions.js'
+import { findChannelId, sanitizeText, ReportPrefill } from './functions.js'
 
 const app = express();
 const port = 3888;
@@ -28,6 +28,10 @@ app.get('/vrchat-report', async (req, res) => {
     }
 
     let redirectUrl;
+
+    const prefill = new ReportPrefill();
+    const baseUrl = "https://help.vrchat.com/hc/en-us/requests/new?ticket_form_id=41536165070483"
+
 
     switch (entry.value.type) {
 
