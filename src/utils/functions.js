@@ -1660,15 +1660,6 @@ export class ReportPrefill {
     return url;
   }
 
-  /**
-   * Constructs a URL param string including text fields if textValue is provided.
-   *
-   * @param {string} category - Main category key
-   * @param {string} key - Selected key in main category
-   * @param {string|null} [subkey=null] - Optional subkey for nested field
-   * @param {string} [textValue=""] - Optional text value for textFields
-   * @returns {string} URL parameters string with all fields and text fields encoded
-   */
   getUrlParamsWithText(category, key, subkey = null, textValue = "") {
     const field = this.fields[category];
     if (!field || !field.values[key]) {
@@ -1677,14 +1668,16 @@ export class ReportPrefill {
 
     let url = `&tf_${field.customFieldId}=${encodeURIComponent(key)}`;
 
-    if (subkey && field.subfields?.[key]) {
+    if (field.subfields?.[key]) {
       const sub = field.subfields[key];
-      if (!sub.values[subkey]) {
-        throw new Error(`Invalid subkey for ${key}: ${subkey}`);
-      }
-      url += `&tf_${sub.customFieldId}=${encodeURIComponent(subkey)}`;
 
-      // If textValue is provided, append text fields params
+      if (subkey) {
+        if (!sub.values[subkey]) {
+          throw new Error(`Invalid subkey for ${key}: ${subkey}`);
+        }
+        url += `&tf_${sub.customFieldId}=${encodeURIComponent(subkey)}`;
+      }
+
       if (textValue && sub.textFields?.length > 0) {
         sub.textFields.forEach(tf => {
           url += `&tf_${tf.customFieldId}=${encodeURIComponent(textValue)}`;
@@ -1702,12 +1695,19 @@ export class ReportPrefill {
       value: key
     }];
 
-    if (subkey && field.subfields?.[key]) {
+    if (field.subfields?.[key]) {
       const sub = field.subfields[key];
-      fields.push({
-        name: `request[custom_fields][${sub.customFieldId}]`,
-        value: subkey
-      });
+
+      if (subkey) {
+        if (!sub.values[subkey]) {
+          throw new Error(`Invalid subkey for ${key}: ${subkey}`);
+        }
+
+        fields.push({
+          name: `request[custom_fields][${sub.customFieldId}]`,
+          value: subkey
+        });
+      }
 
       if (textValue && sub.textFields?.length > 0) {
         sub.textFields.forEach(tf => {
