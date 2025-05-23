@@ -36,7 +36,7 @@ app.get('/vrchat-report', async (req, res) => {
     let reportTypeKey
     let subkey = null
     let additionalText
-    console.log(entry.value.type)
+
     if (entry.value.type.includes('avatar-')) {
       // Avatar only has one category and the description has to describe it
       reportKey = "user_report"; // I want to file a report
@@ -111,8 +111,7 @@ app.get('/vrchat-report', async (req, res) => {
       if (prefill.shouldShowReportType(reportKey)) {
         urlParams += prefill.getUrlParamsWithText("report_type", reportTypeKey, subkey, additionalText);
       }
-      console.log(additionalText)
-      console.log(urlParams)
+
       const userReport = entry.value.type.slice(5) // user-racism turns into racism
       switch (userReport) {
         case 'racism':
