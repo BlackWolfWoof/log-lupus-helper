@@ -1573,3 +1573,167 @@ export async function isTicketHashUsed(emailHash) {
 
     return false;
 }
+
+
+
+/**
+ * Class representing prefill configuration for a report form.
+ * It encapsulates mappings between custom field IDs, ticket field IDs, and their values,
+ * as well as utilities to generate formatted data for forms and URLs.
+ */
+export class ReportPrefill {
+  constructor() {
+    this.fields = {
+      report: {
+        customFieldId: "360056455174",
+        tfId: "360056455174",
+        values: {
+          user_report: "I want to file a report",
+          ban_appeal: "I want to appeal a ban"
+        }
+      },
+      report_type: {
+        customFieldId: "41535925078291",
+        tfId: "41535925078291",
+        values: {
+          content_report: "Content Report",
+          account_report: "Account Report"
+        },
+        subfields: {
+          content_report: {
+            customFieldId: "41535943048211",
+            tfId: "41535943048211",
+            values: {
+              content_report_avatar: "Avatar",
+              content_report_world: "World",
+              content_report_group: "Group",
+              contentreport_issue_not_described: "My issue is not described above"
+            },
+            textFields: [
+              {
+                customFieldId: "41536179133203",
+                label: "Additional content details"
+              }
+            ]
+          },
+          account_report: {
+            customFieldId: "41536076540179",
+            tfId: "41536076540179",
+            values: {
+              account_report_prints: "Prints",
+              account_report_emoji: "Emoji",
+              account_report_stickers: "Stickers",
+              account_report_gallery: "Gallery",
+              account_report_profile: "Profile",
+              account_report_user_icon: "User Icon",
+              take_it_down_act: "TAKE IT DOWN Act (Compliance)",
+              accountreport_issue_not_described: "My issue is not described above"
+            },
+            textFields: [
+              {
+                customFieldId: "41537175838995",
+                label: "Account report explanation"
+              }
+            ]
+          }
+        }
+      }
+    };
+  }
+
+  getUrlParam(category, key, subkey = null) {
+    const field = this.fields[category];
+    if (!field || !field.values[key]) {
+      throw new Error(`Invalid category/key: ${category}.${key}`);
+    }
+
+    let url = `&tf_${field.customFieldId}=${encodeURIComponent(key)}`;
+
+    if (subkey && field.subfields?.[key]) {
+      const sub = field.subfields[key];
+      if (!sub.values[subkey]) {
+        throw new Error(`Invalid subkey for ${key}: ${subkey}`);
+      }
+      url += `&tf_${sub.customFieldId}=${encodeURIComponent(subkey)}`;
+    }
+
+    return url;
+  }
+
+  /**
+   * Constructs a URL param string including text fields if textValue is provided.
+   *
+   * @param {string} category - Main category key
+   * @param {string} key - Selected key in main category
+   * @param {string|null} [subkey=null] - Optional subkey for nested field
+   * @param {string} [textValue=""] - Optional text value for textFields
+   * @returns {string} URL parameters string with all fields and text fields encoded
+   */
+  getUrlParamsWithText(category, key, subkey = null, textValue = "") {
+    const field = this.fields[category];
+    if (!field || !field.values[key]) {
+      throw new Error(`Invalid category/key: ${category}.${key}`);
+    }
+
+    let url = `&tf_${field.customFieldId}=${encodeURIComponent(key)}`;
+
+    if (subkey && field.subfields?.[key]) {
+      const sub = field.subfields[key];
+      if (!sub.values[subkey]) {
+        throw new Error(`Invalid subkey for ${key}: ${subkey}`);
+      }
+      url += `&tf_${sub.customFieldId}=${encodeURIComponent(subkey)}`;
+
+      // If textValue is provided, append text fields params
+      if (textValue && sub.textFields?.length > 0) {
+        sub.textFields.forEach(tf => {
+          url += `&tf_${tf.customFieldId}=${encodeURIComponent(textValue)}`;
+        });
+      }
+    }
+
+    return url;
+  }
+
+  getFormFields(category, key, subkey = null, textValue = "") {
+    const field = this.fields[category];
+    const fields = [{
+      name: `request[custom_fields][${field.customFieldId}]`,
+      value: key
+    }];
+
+    if (subkey && field.subfields?.[key]) {
+      const sub = field.subfields[key];
+      fields.push({
+        name: `request[custom_fields][${sub.customFieldId}]`,
+        value: subkey
+      });
+
+      if (textValue && sub.textFields?.length > 0) {
+        sub.textFields.forEach(tf => {
+          fields.push({
+            name: `request[custom_fields][${tf.customFieldId}]`,
+            value: textValue
+          });
+        });
+      }
+    }
+
+    return fields;
+  }
+
+  getLabel(category, key, subkey = null) {
+    const field = this.fields[category];
+    let label = field?.values[key] || null;
+    if (subkey && field.subfields?.[key]) {
+      const sub = field.subfields[key];
+      const subLabel = sub.values[subkey];
+      label += ` → ${subLabel}`;
+    }
+    return label;
+  }
+
+  shouldShowReportType(reportKey) {
+    return reportKey === "user_report";
+  }
+}
