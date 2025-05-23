@@ -47,20 +47,20 @@ async function main () {
           // Count for open tickets. Resolved and not resolved
           let ticketsOpenUser = 0;
           let ticketsOpenAvatar = 0;
-          for (entry of allUsers) {
-            if (entry.value.ticket) {
+          for (const entry of allUsers) {
+            if ((entry.value.tickets || []).length !== 0) {
               ticketsOpenUser++
             }
           }
-          for (entry of allAvatars) {
-            if (entry.value.ticket) {
+          for (const entry of allAvatars) {
+            if ((entry.value.tickets || []).length !== 0) {
               ticketsOpenAvatar++
             }
           }
 
 
           // Channel topic
-          const sharedMessage = `# Use the \`/report-user\` and \`/report-avatar\` command to create form posts.\n\n### Total tracked: ${allUsers.length + allAvatars.length} ### Tracked:\n- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\`\n- 🖼️Avatars: \`${allAvatars.length}\` 👤\`${ticketsOpenAvatar}\`\n### Terminated:\n- Terminated users: \`${userTotal}\`\n- Terminated avatars: \`${avatarTotal}\``
+          const sharedMessage = `# Use the \`/report-user\` and \`/report-avatar\` command to create form posts.\n\n### Tracked:\n- 🔢Total: \`${allUsers.length + allAvatars.length}\`\n- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\`\n- 🖼️Avatars: \`${allAvatars.length}\` 🎫\`${ticketsOpenAvatar}\`\n### Terminated:\n- 👤Terminated users: \`${userTotal}\`\n- 🖼️Terminated avatars: \`${avatarTotal}\``
 
           await channelUser.setTopic(sharedMessage)
           await channelAvatar.setTopic(sharedMessage)
