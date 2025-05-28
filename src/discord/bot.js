@@ -41,69 +41,74 @@ client.once('ready', async () => {
 
 // Handle command interactions
 client.on("interactionCreate", async (interaction) => {
-  if (interaction.isCommand()) {
-    const { commandName, user } = interaction
-    const command = commands.get(commandName)
-
-    if (!command) {
-      return interaction.reply({
-        content: "🐛 Unknown command! Report this error to the developer.",
-        flags: MessageFlags.Ephemeral
-      })
-    }
-
     try {
-      await command.execute(interaction)
-    } catch (error) {
-      logError(`❌ Error executing ${commandName} by ${user.username}: ${error}`)
-      console.error(error)
+    if (interaction.isCommand()) {
+      const { commandName, user } = interaction
+      const command = commands.get(commandName)
 
-      if (interaction.deferred || interaction.replied) {
-        await interaction.editReply({
-          content: "🐛 You found a bug! Report this error to the developer.",
-          flags: MessageFlags.Ephemeral
-        })
-      } else {
-        await interaction.reply({
-          content: "🐛 You found a bug! Report this error to the developer.",
+      if (!command) {
+        return interaction.reply({
+          content: "🐛 Unknown command! Report this error to the developer.",
           flags: MessageFlags.Ephemeral
         })
       }
-    }
-  }
-  // Handle button/select menu interactions
-  else if (interaction.isButton() || interaction.isStringSelectMenu()) {
-    const interactionHandler = interactions.get(interaction.customId)
 
-    if (!interactionHandler) {
-      logWarn(`[Interaction]: ⚠️ No handler found for ${interaction.customId}`)
-      return
-    }
-
-    try {
-      await interactionHandler(interaction)
-      logDebug(`[Interaction]: ✅ Successfully handled ${interaction.customId} - ${interaction.user.id}`)
-    } catch (error) {
       try {
-        logError(`[Interaction]: ❌ Error handling ${interaction.customId}: ${error.message}`)
+        await command.execute(interaction)
+      } catch (error) {
+        logError(`❌ Error executing ${commandName} by ${user.username}: ${error}`)
         console.error(error)
 
         if (interaction.deferred || interaction.replied) {
           await interaction.editReply({
-            content: "🐛 Something went wrong! Report this error to the developer.",
+            content: "🐛 You found a bug! Report this error to the developer.",
             flags: MessageFlags.Ephemeral
           })
         } else {
           await interaction.reply({
-            content: "🐛 Something went wrong! Report this error to the developer.",
+            content: "🐛 You found a bug! Report this error to the developer.",
             flags: MessageFlags.Ephemeral
           })
         }
-      } catch (e) {
-        logError(`[Interaction]: ❌ Error handeling error`)
-        console.error(error)
       }
     }
+    // Handle button/select menu interactions
+    else if (interaction.isButton() || interaction.isStringSelectMenu()) {
+      const interactionHandler = interactions.get(interaction.customId)
+
+      if (!interactionHandler) {
+        logWarn(`[Interaction]: ⚠️ No handler found for ${interaction.customId}`)
+        return
+      }
+
+      try {
+        await interactionHandler(interaction)
+        logDebug(`[Interaction]: ✅ Successfully handled ${interaction.customId} - ${interaction.user.id}`)
+      } catch (error) {
+        try {
+          logError(`[Interaction]: ❌ Error handling ${interaction.customId}: ${error.message}`)
+          console.error(error)
+
+          if (interaction.deferred || interaction.replied) {
+            await interaction.editReply({
+              content: "🐛 Something went wrong! Report this error to the developer.",
+              flags: MessageFlags.Ephemeral
+            })
+          } else {
+            await interaction.reply({
+              content: "🐛 Something went wrong! Report this error to the developer.",
+              flags: MessageFlags.Ephemeral
+            })
+          }
+        } catch (e) {
+          logError(`[Interaction]: ❌ Error handeling error`)
+          console.error(error)
+        }
+      }
+    }
+  } catch (error) {
+    logError(`[bot]: Fatal error: ${error}`)
+    console.error(error)
   }
 })
 
