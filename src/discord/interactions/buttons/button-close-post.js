@@ -5,7 +5,6 @@ import { findChannelId } from '../../../utils/functions.js';
 
 async function execute(interaction) {
   const thread = interaction.channel
-  const avatar = await findChannelId(interaction.channel.id)
 
   // Archive the thread
   try {
