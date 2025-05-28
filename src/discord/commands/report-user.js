@@ -174,7 +174,8 @@ async function execute(interaction) {
       name: sanitizeText(userInfo.displayName),
       message: {
         embeds: [embed]
-      }
+      },
+      appliedTags: [process.env["DISCORD_USER_NOTICKET_TAG_ID"]]
     });
 
 

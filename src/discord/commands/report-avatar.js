@@ -177,7 +177,8 @@ async function execute(interaction) {
       name: `${avatar.name} (by ${sanitizeText(userInfo?.displayName)})`,
       message: {
         embeds: [embed, embedAvi]
-      }
+      },
+      appliedTags: [process.env["DISCORD_AVATAR_NOTICKET_TAG_ID"]]
     });
 
 
