@@ -174,7 +174,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: avatar.name,
+      name: `"${avatar.name}" by ${sanitizeText(escapeMarkdown(userInfo?.displayName))}`,
       message: {
         embeds: [embed, embedAvi]
       }
