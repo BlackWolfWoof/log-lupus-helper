@@ -12,8 +12,10 @@ async function execute(interaction) {
      const entry = await findChannelId(interaction.channel.id)
     if (entry?.id && entry.id.includes('usr_')) {
       await userDb.delete(entry.id)
-    } else if (entry.id.includes('avtr_')) {
+    } else if (entry?.id && entry.id.includes('avtr_')) {
       await avatarDb.delete(entry.id)
+    } else {
+      logWarn(`[button-close-post]: Entry was not found. Skipping deletion and closing thread.`)
     }
     await interaction.reply({
       content: `✅ Thread has been archived will no longer be tracked.`,
