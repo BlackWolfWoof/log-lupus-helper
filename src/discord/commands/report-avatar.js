@@ -28,8 +28,21 @@ const discord = new SlashCommandBuilder()
   );
 
 async function execute(interaction) {
-  const avatarId = interaction.options.getString('avatar-id');
+  let avatarId = interaction.options.getString('avatar-id');
   const type = interaction.options.getString('type');
+
+  // Check if valid Avatar ID
+  const regex = /avtr_[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/
+  const match = avatarId.match(regex)
+  if (!match) {
+    await interaction.reply({
+      content: `❌ The avatar id you provided is invalid. Here an example of an avatar id: \`avtr_a310c385-72f9-4a4b-8ba0-75b05b1317b3\`.`,
+      flags: MessageFlags.Ephemeral
+    })
+    return
+  } else {
+    avatarId = match[0]
+  }
 
   // Check if already in db
   const alreadyExists = await avatarDb.get(avatarId)
@@ -63,7 +76,6 @@ async function execute(interaction) {
     })
     return
   }
-
 
   const userInfo = await getUser(avatar.authorId);
   const userGroups = await getUserGroups(avatar.authorId);

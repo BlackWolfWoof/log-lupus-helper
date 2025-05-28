@@ -32,8 +32,21 @@ const discord = new SlashCommandBuilder()
   );
 
 async function execute(interaction) {
-  const userId = interaction.options.getString('user-id');
+  let userId = interaction.options.getString('user-id');
   const type = interaction.options.getString('type');
+
+  // Check if valid User ID
+  const regex = /usr_[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/
+  const match = userId.match(regex)
+  if (!match) {
+    await interaction.reply({
+      content: `❌ The user id you provided is invalid. Here an example of an user id: \`usr_a310c385-72f9-4a4b-8ba0-75b05b1317b3\`.`,
+      flags: MessageFlags.Ephemeral
+    })
+    return
+  } else {
+    userId = match[0] // Filter out the user id, if someone suplies a link
+  }
 
   // Check if already in db
   const alreadyExists = await userDb.get(userId)
