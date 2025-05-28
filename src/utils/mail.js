@@ -59,7 +59,7 @@ export async function processNewEmail() {
               const emailHash = sha256Hash(`${msg.envelope.date}-${msg.envelope.subject}`)
               const skipEmail = await isTicketHashUsed(emailHash)
               if (!skipEmail) {
-                logInfo(`[email]: [${date}] Subject: ${subject}`);
+                logDebug(`[email]: [${date}] Subject: ${subject}`);
                 // Parse email body
                 const parsed = await simpleParser(msg.source, {
                   skipImageLinks: true,
