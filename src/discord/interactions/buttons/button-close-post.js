@@ -21,6 +21,9 @@ async function execute(interaction) {
       content: `✅ Thread has been archived will no longer be tracked.`,
       flags: MessageFlags.Ephemeral
     });
+    await thread.edit({
+      appliedTags: []
+    })
     await thread.setArchived(true, `Archived via button by ${interaction.user.id}`);
     return
   } catch (error) {
