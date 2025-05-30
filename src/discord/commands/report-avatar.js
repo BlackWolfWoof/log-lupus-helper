@@ -169,7 +169,7 @@ async function execute(interaction) {
   const embedAvi = new EmbedBuilder()
     .setTitle(sanitizeText(escapeMarkdown(avatar.name)))
     .setURL(`https://vrchat.com/home/avatar/${avatar.id}?aviId=${avatar.id}`)
-    .setImage(avatar.thumbnailImageUrl)
+    .setImage(avatar.thumbnailImageUrl || null)
     .setDescription(`\`\`\`${avatar.id}\`\`\``)
     .addFields(
       { name: "Description", value: escapeMarkdown(avatar.description).slice(0, 1024), inline: false },
