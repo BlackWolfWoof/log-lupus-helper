@@ -87,7 +87,7 @@ async function createSession(username, password) {
   const auth = Buffer.from(`${encodeURIComponent(username)}:${encodeURIComponent(password)}`).toString("base64")
   const response = await vrchatFetch("https://api.vrchat.cloud/api/1/auth/user", {
     headers: {
-      "Authorization": `Basic ${auth}`,
+      "Authorization": `Basic ${auth}`
     },
     method: "GET",
     credentials: "include"
@@ -126,7 +126,7 @@ async function authInvalid() {
       const twoFactorAuth = await getAuthTOTP(auth, totpCode)
 
       logInfo(`[Auth]: Success. Saving credentials...`)
-      await saveCredentials(auth, twoFactorAuth)
+      await saveCredentials(auth)
 
       dotenv.config() // Reload the updated credentials
       logInfo(`[Auth]: 🔄️ Reloaded env vars`)
@@ -135,7 +135,7 @@ async function authInvalid() {
       logError(`[Auth]: Login attempt ${attempts + 1} failed: ${error.message}`)
       attempts++
 
-      if (attempts >= 5) {
+      if (attempts >= 3) {
         logError("[Auth]: Maximum login attempts reached. Exiting...")
         process.exit(1)
       }
