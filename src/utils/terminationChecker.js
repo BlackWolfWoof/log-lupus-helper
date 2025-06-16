@@ -1,3 +1,4 @@
+import './loadEnv.js'
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { avatarDb, userDb, countDb } from './quickdb.js'
 import { findChannelId, getAvatar, getUser } from './functions.js'
@@ -16,7 +17,7 @@ export async function checkTermination() {
       // If avi gone
       if (refreshedAvatar.error && refreshedAvatar.error.status_code === 404) {
         // Avatar gone
-        logInfo`[terminationChecker]: Avi gone ${entry.value.vrc.id} - ${entry.value.vrc.name}`
+        // logInfo`[terminationChecker]: Avi gone ${entry.id} - ${entry.value.vrc.name}`
         // If author has robot avi
         const targetUser = await getUser(entry.value.vrc.authorId, false)
         let thread;
