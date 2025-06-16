@@ -2,6 +2,7 @@ import { client } from '../../bot.js'
 import { MessageFlags } from 'discord.js';
 import { avatarDb, userDb } from '../../../utils/quickdb.js'
 import { findChannelId } from '../../../utils/functions.js';
+import { logDebug, logInfo, logWarn, logError } from '../../../utils/logger.js'
 
 async function execute(interaction) {
   const thread = interaction.channel
