@@ -108,9 +108,9 @@ async function authInvalid() {
   let attempts = 0
   let delay = 5000 // Start with 1 second
 
-  while (attempts < 5) {
+  while (attempts < 3) {
     try {
-      logWarn(`[Auth]: Session invalid. Attempt ${attempts + 1}/5. Generating new session...`)
+      logWarn(`[Auth]: Session invalid. Attempt ${attempts + 1}/3. Generating new session...`)
 
       const auth = await createSession(process.env["VRCHAT_USERNAME"], process.env["VRCHAT_PASSWORD"])
       if (!auth) process.exit(1)
@@ -136,7 +136,7 @@ async function authInvalid() {
         process.exit(1)
       }
 
-      logWarn(`[Auth]: Retrying in ${delay / 1000} seconds...`)
+      logWarn(`[Auth]: Retrying in ${delay / 5000} seconds...`)
       await sleep(delay)
       delay *= 2 // Double the wait time for the next attempt
     }
