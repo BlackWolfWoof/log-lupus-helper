@@ -5,6 +5,9 @@ import { authenticator } from "otplib"
 import { logInfo, logError, logWarn, logDebug } from "../utils/logger.js"
 import { vrchatFetch } from "./apiQueue.js"
 
+// Token storage
+export let vrchatToken = process.env["VRCHAT_TOKEN"] || ""
+
 // Utility sleep function
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -65,6 +68,7 @@ async function saveCredentials(auth) {
   try {
     let data = await fs.readFile(".env", "utf-8")
     data = data.replace(/VRCHAT_TOKEN=.*/, `VRCHAT_TOKEN=auth=${auth}`) // Update token
+    vrchatToken = `auth=${auth}`
     await fs.writeFile(".env", data)
     logDebug(`[Auth]: Credentials saved successfully.`)
   } catch (err) {
