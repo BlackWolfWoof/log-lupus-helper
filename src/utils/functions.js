@@ -178,7 +178,7 @@ export async function getGroup(groupId, useCache = true) {
       await setCache(groupId, data)
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       data = await getGroup(groupId, useCache)
       break
   }
@@ -229,7 +229,7 @@ export async function getGroupMember(groupId, userId, useCache = true) {
       await setCache(`${groupId}_member_${userId}`, data)
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       data = await getGroupMember(groupId, userId, useCache)
       break
   }
@@ -278,7 +278,7 @@ export async function getGroupRoles(groupId, useCache = true) {
       await setCache(`${groupId}_roles`, data)
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       data = await getGroupRoles(groupId, useCache)
       break
   }
@@ -373,7 +373,7 @@ export async function getUser(userId, useCache = true) {
       await setCache(userId, data)
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       data = await getUser(userId, useCache)
       break
     case 404:
@@ -442,7 +442,7 @@ export async function getUserGroups(userId, useCache = true) {
       await setCache(`${userId}_group`, data)
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       data = await getUserGroups(userId, useCache)
       break
     case 404:
@@ -669,7 +669,7 @@ export async function joinGroup(groupId) {
     case 409: // Blocked group by user
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       data = await joinGroup(groupId)
       break
     case 404:
@@ -933,7 +933,7 @@ async function getGroupLog(groupId, amount = 60, offset = 0) {
     case 403:
       break;
     case 401:
-      await testSession();
+      await testSession(process.env["VRCHAT_TOKEN"]);
       return await getGroupLog(groupId, amount, offset); // Retry with valid session
     case 404: // Group not found
       break;
@@ -1012,7 +1012,7 @@ export async function banUser(groupId, userId) {
     case 403:
       break;
     case 401:
-      await testSession();
+      await testSession(process.env["VRCHAT_TOKEN"]);
       data = await banUser(groupId, userId);
       break;
   }
@@ -1049,7 +1049,7 @@ export async function unbanUser(groupId, userId) {
     case 403:
       break;
     case 401:
-      await testSession();
+      await testSession(process.env["VRCHAT_TOKEN"]);
       data = await unbanUser(groupId, userId);
       break;
   }
@@ -1086,7 +1086,7 @@ export async function kickUser(groupId, userId) {
     case 403:
       break;
     case 401:
-      await testSession();
+      await testSession(process.env["VRCHAT_TOKEN"]);
       data = await kickUser(groupId, userId);
       break;
   }
@@ -1158,7 +1158,7 @@ export async function getCurrentUser(useCache = true) {
       await setCache(`currentUser`, data)
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       data = await getCurrentUser(useCache)
       break
   }
@@ -1203,7 +1203,7 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
     case 403:
       break;
     case 401:
-      await testSession();
+      await testSession(process.env["VRCHAT_TOKEN"]);
       data = await respondJoinRequest(groupId, userId, action = false, block = false);
       break;
   }
@@ -1243,7 +1243,7 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
 //     case 403:
 //       break;
 //     case 401:
-//       await testSession();
+//       await testSession(process.env["VRCHAT_TOKEN"]);
 //       data = await getGroupNote(userId);
 //       break;
 //   }
@@ -1284,7 +1284,7 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
 //     case 403:
 //       break;
 //     case 401:
-//       await testSession();
+//       await testSession(process.env["VRCHAT_TOKEN"]);
 //       data = await setGroupNote(userId, note);
 //       break;
 //   }
@@ -1336,7 +1336,7 @@ export function getGroupEmoji(groupId) {
  *
  * This function sends a GET request to `https://api.vrchat.cloud/api/1/avatars/{avatarId}`,
  * retrieving full metadata about an avatar including author, URLs, tags, and Unity packages.
- * If the request returns a 401 status code, it attempts to refresh or validate the session via `testSession()`.
+ * If the request returns a 401 status code, it attempts to refresh or validate the session via `testSession(process.env["VRCHAT_TOKEN"])`.
  *
  * @async
  * @function getAvatar
@@ -1403,7 +1403,7 @@ export async function getAvatar(avatarId) {
       // Store in cache
       break
     case 401:
-      await testSession()
+      await testSession(process.env["VRCHAT_TOKEN"])
       break
   }
 
