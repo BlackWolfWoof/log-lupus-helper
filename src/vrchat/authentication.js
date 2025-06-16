@@ -150,14 +150,9 @@ async function authInvalid() {
 
 /**
  * Test the current VRChat session and refreshes it if needed.
- * @param {string} token - The VRChat authentication token.
  */
-export async function testSession(token) {
+export async function testSession() {
   const response = await vrchatFetch("https://api.vrchat.cloud/api/1/auth/user", {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": token
-    },
     method: "GET"
   }, 10) // Max priority
   // const data = await response.json()
@@ -167,5 +162,5 @@ export async function testSession(token) {
 
 // Auto-login when the script starts
 logInfo(`[Auth]: Logging in to VRChat...`)
-await testSession(process.env["VRCHAT_TOKEN"])
+await testSession()
 logInfo(`[Auth]: Login success!`)
