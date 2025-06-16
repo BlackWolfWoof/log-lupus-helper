@@ -31,7 +31,6 @@ function generateOTP(seed) {
 async function getAuthTOTP(auth, totpCode) {
   const response = await vrchatFetch("https://api.vrchat.cloud/api/1/auth/twofactorauth/totp/verify", {
     headers: {
-      "User-Agent": process.env["USERAGENT"],
       "Content-Type": "application/json",
       "Cookie": `auth=${auth}`
     },
@@ -84,8 +83,7 @@ async function createSession(username, password) {
   const auth = Buffer.from(`${encodeURIComponent(username)}:${encodeURIComponent(password)}`).toString("base64")
   const response = await vrchatFetch("https://api.vrchat.cloud/api/1/auth/user", {
     headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Authorization": `Basic ${auth}`
+      "Authorization": `Basic ${auth}`,
     },
     method: "GET",
     credentials: "include"

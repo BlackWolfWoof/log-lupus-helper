@@ -162,10 +162,6 @@ export async function getGroup(groupId, useCache = true) {
 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   })
 
@@ -178,7 +174,7 @@ export async function getGroup(groupId, useCache = true) {
       await setCache(groupId, data)
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       data = await getGroup(groupId, useCache)
       break
   }
@@ -211,10 +207,6 @@ export async function getGroupMember(groupId, userId, useCache = true) {
 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/members/${userId}`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   }, 9)
 
@@ -229,7 +221,7 @@ export async function getGroupMember(groupId, userId, useCache = true) {
       await setCache(`${groupId}_member_${userId}`, data)
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       data = await getGroupMember(groupId, userId, useCache)
       break
   }
@@ -261,10 +253,6 @@ export async function getGroupRoles(groupId, useCache = true) {
 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/roles`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   }, 9)
 
@@ -278,7 +266,7 @@ export async function getGroupRoles(groupId, useCache = true) {
       await setCache(`${groupId}_roles`, data)
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       data = await getGroupRoles(groupId, useCache)
       break
   }
@@ -357,10 +345,6 @@ export async function getUser(userId, useCache = true) {
 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/users/${userId}`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   })
 
@@ -373,7 +357,7 @@ export async function getUser(userId, useCache = true) {
       await setCache(userId, data)
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       data = await getUser(userId, useCache)
       break
     case 404:
@@ -426,10 +410,6 @@ export async function getUserGroups(userId, useCache = true) {
 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/users/${userId}/groups`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   })
 
@@ -442,7 +422,7 @@ export async function getUserGroups(userId, useCache = true) {
       await setCache(`${userId}_group`, data)
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       data = await getUserGroups(userId, useCache)
       break
     case 404:
@@ -652,10 +632,6 @@ export async function parseLocation(tag) {
 export async function joinGroup(groupId) {
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/join`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "POST"
   }, 9) // Very high priority
 
@@ -669,7 +645,7 @@ export async function joinGroup(groupId) {
     case 409: // Blocked group by user
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       data = await joinGroup(groupId)
       break
     case 404:
@@ -918,10 +894,6 @@ async function getGroupLog(groupId, amount = 60, offset = 0) {
 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/auditLogs?n=${amount}&offset=${offset}`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   }, 7); // High priority
 
@@ -933,7 +905,7 @@ async function getGroupLog(groupId, amount = 60, offset = 0) {
     case 403:
       break;
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"]);
+      await testSession();
       return await getGroupLog(groupId, amount, offset); // Retry with valid session
     case 404: // Group not found
       break;
@@ -995,8 +967,6 @@ export async function banUser(groupId, userId) {
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/bans`, {
     headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"],
       "Content-Type": "application/json"
     },
     method: "POST",
@@ -1012,7 +982,7 @@ export async function banUser(groupId, userId) {
     case 403:
       break;
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"]);
+      await testSession();
       data = await banUser(groupId, userId);
       break;
   }
@@ -1033,8 +1003,6 @@ export async function unbanUser(groupId, userId) {
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/bans/${userId}`, {
     headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"],
       "Content-Type": "application/json"
     },
     method: "DELETE",
@@ -1049,7 +1017,7 @@ export async function unbanUser(groupId, userId) {
     case 403:
       break;
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"]);
+      await testSession();
       data = await unbanUser(groupId, userId);
       break;
   }
@@ -1070,8 +1038,6 @@ export async function kickUser(groupId, userId) {
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/members/${userId}`, {
     headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"],
       "Content-Type": "application/json"
     },
     method: "DELETE",
@@ -1086,7 +1052,7 @@ export async function kickUser(groupId, userId) {
     case 403:
       break;
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"]);
+      await testSession();
       data = await kickUser(groupId, userId);
       break;
   }
@@ -1142,10 +1108,6 @@ export async function getCurrentUser(useCache = true) {
 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/auth/user`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   }, 9)
 
@@ -1158,7 +1120,7 @@ export async function getCurrentUser(useCache = true) {
       await setCache(`currentUser`, data)
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       data = await getCurrentUser(useCache)
       break
   }
@@ -1186,8 +1148,6 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/groups/${groupId}/requests/${userId}`, {
     headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"],
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ action: action, block: block}),
@@ -1203,7 +1163,7 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
     case 403:
       break;
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"]);
+      await testSession();
       data = await respondJoinRequest(groupId, userId, action = false, block = false);
       break;
   }
@@ -1243,7 +1203,7 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
 //     case 403:
 //       break;
 //     case 401:
-//       await testSession(process.env["VRCHAT_TOKEN"]);
+//       await testSession();
 //       data = await getGroupNote(userId);
 //       break;
 //   }
@@ -1284,7 +1244,7 @@ export async function respondJoinRequest(groupId, userId, action = false, block 
 //     case 403:
 //       break;
 //     case 401:
-//       await testSession(process.env["VRCHAT_TOKEN"]);
+//       await testSession();
 //       data = await setGroupNote(userId, note);
 //       break;
 //   }
@@ -1336,7 +1296,7 @@ export function getGroupEmoji(groupId) {
  *
  * This function sends a GET request to `https://api.vrchat.cloud/api/1/avatars/{avatarId}`,
  * retrieving full metadata about an avatar including author, URLs, tags, and Unity packages.
- * If the request returns a 401 status code, it attempts to refresh or validate the session via `testSession(process.env["VRCHAT_TOKEN"])`.
+ * If the request returns a 401 status code, it attempts to refresh or validate the session via `testSession()`.
  *
  * @async
  * @function getAvatar
@@ -1388,10 +1348,6 @@ export function getGroupEmoji(groupId) {
 export async function getAvatar(avatarId) {
   // Fetch new data from API
   const response = await vrchatFetch(`https://api.vrchat.cloud/api/1/avatars/${avatarId}`, {
-    headers: {
-      "User-Agent": process.env["USERAGENT"],
-      "Cookie": process.env["VRCHAT_TOKEN"]
-    },
     method: "GET"
   }, 6)
 
@@ -1403,7 +1359,7 @@ export async function getAvatar(avatarId) {
       // Store in cache
       break
     case 401:
-      await testSession(process.env["VRCHAT_TOKEN"])
+      await testSession()
       break
   }
 
