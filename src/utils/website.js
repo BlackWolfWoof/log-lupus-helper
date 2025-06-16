@@ -25,6 +25,13 @@ app.get('/vrchat-report', async (req, res) => {
           status_code: 401
         }
       });
+    } else if (entry.value.tickets && entry.value.tickets.length !== 0) {
+      return res.status(409).send({
+        error: {
+          message: 'Ticket already exists for this this post. To prevent dupes, you can only create one',
+          status_code: 409
+        }
+      });
     }
 
     let redirectUrl;
@@ -172,7 +179,7 @@ app.get('/vrchat-report', async (req, res) => {
           redirectUrl = baseUrl +
             urlParams +
             `&tf_subject=%5BUser%5D%20Threats%20%2F%20Promoting%20Self-Harm%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
-            `&tf_description=${encodeURIComponent(`I encountered a user threataning or promoting self-harm. The attachments may include media showcasing the users and voice as well as other evidence.<br><br>` +
+            `&tf_description=${encodeURIComponent(`I encountered a user threatening or promoting self-harm. The attachments may include media showcasing the users and voice as well as other evidence.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
             `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
