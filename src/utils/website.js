@@ -184,6 +184,15 @@ app.get('/vrchat-report', async (req, res) => {
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
             `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
           break
+        case 'crasher':
+          redirectUrl = baseUrl +
+            urlParams +
+            `&tf_subject=%5BUser%5D%20Crasher%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
+            `&tf_description=${encodeURIComponent(`The User in question disrupts the gameplay by crashing/lagging the client of the users. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
+            `Offending User ID: ${entry.id}<br>` +
+            `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
+            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+          break
         case 'other':
           redirectUrl = baseUrl +
             urlParams +

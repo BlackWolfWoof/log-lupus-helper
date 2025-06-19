@@ -27,6 +27,7 @@ const discord = new SlashCommandBuilder()
         { name: 'Bad Sticker/Print', value: 'user-media' },
         { name: 'Promoting Selfharm', value: 'user-selfharm' },
         { name: 'Bad Username', value: 'user-badusername' },
+        { name: 'Crasher', value: 'user-crasher' },
         { name: 'Other reason', value: 'user-other' }
       )
   );
