@@ -1,6 +1,16 @@
 import '../utils/loadEnv.js'
 import { logDebug, logInfo, logWarn, logError } from '../utils/logger.js';
-import { vrchatToken } from './authentication.js';
+import { initAuthentication } from './authentication.js';
+
+let vrchatToken = process.env["VRCHAT_TOKEN"] || ""
+
+export function getVrchatToken() {
+  return vrchatToken
+}
+
+export function setVrchatToken(token) {
+  vrchatToken = token
+}
 
 const requestQueue = [];
 let isProcessing = false;
@@ -49,7 +59,7 @@ async function processQueue() {
       const originalHeaders = options.headers || {};
       const updatedHeaders = {
         ...originalHeaders,
-        ...(originalHeaders["Cookie"] ? {} : { "Cookie": vrchatToken }),
+        ...(originalHeaders["Cookie"] ? {} : { "Cookie": getVrchatToken() }),
         ...(originalHeaders["User-Agent"] ? {} : { "User-Agent": process.env["USERAGENT"] }),
       };
 
@@ -100,3 +110,7 @@ async function processQueue() {
 
   isProcessing = false;
 }
+
+(async () => {
+  await initAuthentication();
+})();

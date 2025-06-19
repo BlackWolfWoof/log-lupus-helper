@@ -3,10 +3,7 @@ import dotenv from 'dotenv'; dotenv.config()
 import fs from "fs/promises"
 import { authenticator } from "otplib"
 import { logInfo, logError, logWarn, logDebug } from "../utils/logger.js"
-import { vrchatFetch } from "./apiQueue.js"
-
-// Token storage
-export let vrchatToken = process.env["VRCHAT_TOKEN"] || ""
+import { vrchatFetch, setVrchatToken, getVrchatToken } from "./apiQueue.js"
 
 // Utility sleep function
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -68,7 +65,7 @@ async function saveCredentials(auth) {
   try {
     let data = await fs.readFile(".env", "utf-8")
     data = data.replace(/VRCHAT_TOKEN=.*/, `VRCHAT_TOKEN=auth=${auth}`) // Update token
-    vrchatToken = `auth=${auth}`
+    setVrchatToken(`auth=${auth}`)
     await fs.writeFile(".env", data)
     logDebug(`[Auth]: Credentials saved successfully.`)
   } catch (err) {
@@ -132,6 +129,7 @@ async function authInvalid() {
       logInfo(`[Auth]: 🔄️ Reloaded env vars`)
       return // Exit the function if successful
     } catch (error) {
+      console.error(error)
       logError(`[Auth]: Login attempt ${attempts + 1} failed: ${error.message}`)
       attempts++
 
@@ -147,7 +145,7 @@ async function authInvalid() {
   }
 }
 
-
+let currentUser
 /**
  * Test the current VRChat session and refreshes it if needed.
  */
@@ -161,6 +159,8 @@ export async function testSession() {
 
 
 // Auto-login when the script starts
-logInfo(`[Auth]: Logging in to VRChat...`)
-await testSession()
-logInfo(`[Auth]: Login success!`)
+export async function initAuthentication() {
+  logInfo(`[Auth]: Logging in to VRChat...`)
+  await testSession()
+  logInfo(`[Auth]: Login success!`)
+}
