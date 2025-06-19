@@ -1,3 +1,4 @@
+import './loadEnv.js'
 import { client } from '../discord/bot.js'
 import { checkTermination } from "./terminationChecker.js";
 import { emailConnection } from './mail.js'
