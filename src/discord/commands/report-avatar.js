@@ -60,6 +60,20 @@ async function execute(interaction) {
   const getServiceAccount = await getCurrentUser()
   const avatar = await getAvatar(avatarId)
 
+  if (avatar.error) {
+    switch (avatar.error.status_code) {
+      case 404:
+        await interaction.editReply({
+          content: `❌ The avatar does not exist or has already been deleted.`,
+          flags: MessageFlags.Ephemeral
+        })
+        return
+      default:
+        await sendBugMessage(interaction, true, false)
+        return
+    }
+  }
+
   // Security settings so you cannot get info about your own avatar. This would give people the ability to query avatars from the logged in user otherwise
   if (getServiceAccount.id === avatar.authorId) {
     await interaction.editReply({

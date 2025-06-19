@@ -84,8 +84,9 @@ async function execute(interaction) {
     return
   }
 
+  // Check if user has already been termed
   // If user has robot avi, i can't track the takedown status as thats the way this is done
-  if (userInfo.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
+  if (userInfo.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file' && userInfo.statusDescription === '' && userInfo.bio === '') {
     await interaction.editReply({
       content: `❌ The user was already terminated or currently has the [Robot](<https://vrchat.com/home/avatar/avtr_c38a1615-5bf5-42b4-84eb-a8b6c37cbd11>) avatar equipped.\nThe way this tool detects the termination is, if someone has the avatar.\nReasons why someone has that avatar:\n- Terminated/Banned\n- Avatar they used got removed/set private\n- User switched into the avatar manually`,
       flags: MessageFlags.Ephemeral
