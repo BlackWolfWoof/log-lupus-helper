@@ -176,13 +176,12 @@ async function execute(interaction) {
       iconURL: interaction.user.displayAvatarURL({ dynamic: true, size: 512 })
     });
 
-
   // Avatar
   const avatarCreatedAt = Math.floor(new Date(avatar.created_at).getTime() / 1000);
   const avatarUpdatedAt = Math.floor(new Date(avatar.updated_at).getTime() / 1000);
   const embedAvi = new EmbedBuilder()
     .setTitle(sanitizeText(escapeMarkdown(avatar.name)))
-    .setURL(`https://vrchat.com/home/avatar/${avatar.id}?aviId=${avatar.id}`)
+    .setURL(`https://vrchat.com/home/avatar/${avatar.id}`)
     .setImage(avatar.thumbnailImageUrl || null)
     .setDescription(`\`\`\`${avatar.id}\`\`\``)
     .addFields(
