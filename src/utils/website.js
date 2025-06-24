@@ -160,8 +160,8 @@ app.get('/vrchat-report', async (req, res) => {
         case 'media':
           redirectUrl = baseUrl +
             urlParams +
-            `&tf_subject=%5BUser%5D%20Pedophelia%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
-            `&tf_description=${encodeURIComponent(`I encountered a user exhibiting predatory behavior toward minors in VRChat. They made inappropriate comments and attempted to engage in grooming behavior. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
+            `&tf_subject=%5BUser%5D%20Bad%20media%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
+            `&tf_description=${encodeURIComponent(`I encountered a user uploading and posting inappropriate media to the platform. The attachments may include media showcasing the users behavior and media they uploaded.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
             `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
