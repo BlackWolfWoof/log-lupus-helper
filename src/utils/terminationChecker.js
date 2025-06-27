@@ -57,7 +57,7 @@ export async function checkTermination() {
 
           continue // Continue with other avis
         }
-        if (targetUser.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file' && targetUser.statusDescription === '' && targetUser.bio === '') {
+        if (targetUser.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
           // User is maybe terminated.
           // For now, report this instantly, no grace period
           logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} has been deleted and user is termed`)
@@ -114,6 +114,7 @@ export async function checkTermination() {
 
   // Loop over users
   for (const entry of allUsers) {
+    if (entry.value.force) continue // Skip "force" and do not use termination checks on them
     try {
       const refreshedUser = await getUser(entry.id, false)
       // If author has robot avi
@@ -152,7 +153,7 @@ export async function checkTermination() {
 
         continue // Continue with other users
       }
-      if (refreshedUser.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file' && refreshedUser.bio === '' && refreshedUser.statusDescription === '') {
+      if (refreshedUser.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
         // User is maybe terminated.
         // For now, report this instantly, no grace period
         logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.displayName} user is termed/banned`)
