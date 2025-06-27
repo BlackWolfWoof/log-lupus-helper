@@ -30,17 +30,11 @@ const discord = new SlashCommandBuilder()
         { name: 'Crasher', value: 'user-crasher' },
         { name: 'Other reason', value: 'user-other' }
       )
-  )
-  .addBooleanOption(option =>
-    option.setName('force')
-      .setDescription('If true, disables termination checking')
-      .setRequired(false)
   );
 
 async function execute(interaction) {
   let userId = interaction.options.getString('user-id');
   const type = interaction.options.getString('type');
-  const force = interaction.options.getBoolean('force');
 
   // Check if valid User ID
   const regex = /usr_[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}/
@@ -92,7 +86,7 @@ async function execute(interaction) {
 
   // Check if user has already been termed
   // If user has robot avi, i can't track the takedown status as thats the way this is done
-  if (userInfo.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file' && !force) {
+  if (userInfo.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
     await interaction.editReply({
       content: `❌ The user was already terminated or currently has the [Robot](<https://vrchat.com/home/avatar/avtr_c38a1615-5bf5-42b4-84eb-a8b6c37cbd11>) avatar equipped.\nThe way this tool detects the termination is, if someone has the avatar.\nReasons why someone has that avatar:\n- Terminated/Banned\n- Avatar they used got removed/set private\n- User switched into the avatar manually`,
       flags: MessageFlags.Ephemeral
@@ -215,17 +209,6 @@ async function execute(interaction) {
       .setEmoji(`🗑️`);
 
     const row = new ActionRowBuilder().addComponents(buttonCloseThread)
-
-    // If force is set, add more buttons
-    if (force) {
-      const buttonTerminated = new ButtonBuilder()
-        .setStyle(ButtonStyle.Danger)
-        .setCustomId('button-force-user-terminated')
-        .setEmoji('🪦');
-
-        row.addComponents(buttonTerminated)
-    }
-
     row.addComponents(buttonReport)
 
     const starterMessage = await thread.fetchStarterMessage({ force: true })
@@ -243,8 +226,7 @@ async function execute(interaction) {
       type: type,
       submitter: interaction.user.id,
       vrc: userInfo,
-      tickets: [],
-      force: force
+      tickets: []
     })
     await thread.message
     // Reply to user with OK
