@@ -1,5 +1,5 @@
 import { MessageFlags } from 'discord.js';
-import { avatarDb, userDb } from '../../../utils/quickdb.js'
+import { avatarDb, userDb, countDb } from '../../../utils/quickdb.js'
 import { findChannelId } from '../../../utils/functions.js';
 import { logDebug, logInfo, logWarn, logError } from '../../../utils/logger.js'
 
@@ -14,6 +14,7 @@ async function execute(interaction) {
         appliedTags: [process.env["DISCORD_USER_TERM_TAG_ID"]]
       })
       await userDb.delete(entry.id)
+      await countDb.add(entry.value.type, 1)
     } else if (entry?.id && entry.id.includes('avtr_')) {
       // This should not be needed here, as we can check if the user was termed via the avatar 404
       // await thread.edit({
@@ -30,7 +31,6 @@ async function execute(interaction) {
     await thread.edit({
       appliedTags: [process.env["DISCORD_USER_TERM_TAG_ID"]]
     })
-    await countDb.add(entry.value.type, 1)
     await thread.setArchived(true, `Archived via button by ${interaction.user.id}`);
     return
   } catch (error) {
