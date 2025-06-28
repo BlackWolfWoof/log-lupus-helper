@@ -107,8 +107,8 @@ async function execute(interaction) {
 
   // Combine age verification and age status
   let ageIcon = "✖️"; // Default: Not Verified
-  if (userInfo?.ageVerified) ageIcon = "✔️"; 
-  if (userInfo?.ageVerificationStatus === "+18") ageIcon = "🔞";
+  if (userInfo?.ageVerified) ageIcon = "✔️";
+  if (userInfo?.ageVerificationStatus === "18+") ageIcon = "🔞";
 
   // Format date_joined
   let joinedTimestamp = "Unknown";
