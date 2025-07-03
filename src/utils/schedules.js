@@ -61,7 +61,7 @@ async function main () {
 
 
           // Channel topic
-          const sharedMessage = `# Use the \`/report-user\` and \`/report-avatar\` command to create form posts.\n\n### Tracked:\n- 🔢Total: \`${allUsers.length + allAvatars.length}\`\n- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\`\n- 🖼️Avatars: \`${allAvatars.length}\` 🎫\`${ticketsOpenAvatar}\`\n### Removed:\n- Banned users: \`${userTotal}\`\n- 🖼️Terminated avatars: \`${avatarTotal}\``
+          const sharedMessage = `# Use the \`/report-user\` and \`/report-avatar\` command to create form posts.\n\n### Tracked:\n- 🔢Total: \`${allUsers.length + allAvatars.length}\`\n- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\`\n- 🖼️Avatars: \`${allAvatars.length}\` 🎫\`${ticketsOpenAvatar}\`\n### Removed:\n- 👤Users: \`${userTotal}\`\n- 🖼️Avatars: \`${avatarTotal}\``
 
           await channelUser.setTopic(sharedMessage)
           await channelAvatar.setTopic(sharedMessage)
