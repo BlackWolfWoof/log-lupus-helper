@@ -59,6 +59,7 @@ app.get('/vrchat-report', async (req, res) => {
         case "avatar-nsfw":
         redirectUrl = baseUrl +
           urlParams +
+          `&tf_41536076540179=accountreport_issue_not_described` +
           `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20is%20missing%20content_sex%20tag%20%28Automated%20${channelId}%29` +
           `&tf_description=${encodeURIComponent(`The Avatar in question has adult features but is missing the content_sex tag. The attachments may include media showcasing the avatar.<br><br>` +
           `Avatar ID: ${entry.id}<br>` +
@@ -70,6 +71,7 @@ app.get('/vrchat-report', async (req, res) => {
       case "avatar-crasher":
         redirectUrl = baseUrl +
           urlParams +
+          `&tf_41536076540179=accountreport_issue_not_described` +
           `&tf_subject=%5BAvatar%5D%20Crasher%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
           `&tf_description=${encodeURIComponent(`The Avatar in question disrupts the gameplay by crashing/lagging the client of the users. The attachments may include media showcasing the avatar.<br><br>` +
             `Avatar ID: ${entry.id}<br>` +
@@ -81,6 +83,7 @@ app.get('/vrchat-report', async (req, res) => {
       case "avatar-racist":
         redirectUrl = baseUrl +
           urlParams +
+          `&tf_41536076540179=accountreport_issue_not_described` +
           `&tf_subject=%5BAvatar%5D%20Racist%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
           `&tf_description=${encodeURIComponent(`The Avatar in question is offensive/racist. The attachments may include media showcasing the avatar.<br><br>` +
             `Avatar ID: ${entry.id}<br>` +
@@ -92,6 +95,7 @@ app.get('/vrchat-report', async (req, res) => {
       case "avatar-other":
         redirectUrl = baseUrl +
           urlParams +
+          `&tf_41536076540179=accountreport_issue_not_described` +
           `&tf_subject=%5BAvatar%5D%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
           `&tf_description=${encodeURIComponent(`The attachments may include media showcasing the avatar.<br><br>` +
             `Avatar ID: ${entry.id}<br>` +
@@ -124,6 +128,7 @@ app.get('/vrchat-report', async (req, res) => {
         case 'racism':
           redirectUrl = baseUrl +
             urlParams +
+            `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BUser%5D%20Racist%20User%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
             `&tf_description=${encodeURIComponent(`The user in question is using offensive/racist language. The attachments may include media showcasing the users behavior.<br><br>` +
               `Offending User ID: ${entry.id}<br>` +
@@ -133,6 +138,7 @@ app.get('/vrchat-report', async (req, res) => {
         case 'nsfw':
           redirectUrl = baseUrl +
             urlParams +
+            `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BUser%5D%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20uses%20adult%20avatar%20in%20public%20%20%28Automated%20${channelId}%29` +
             `&tf_description=${encodeURIComponent(`The user in question is using an avatar with adult features in a none age gated instance. The avatar itself is properly tagged as content_sex. The attachments may include media showcasing the users behavior.<br><br>` +
               `Offending User ID: ${entry.id}<br>` +
@@ -142,6 +148,7 @@ app.get('/vrchat-report', async (req, res) => {
         case 'child':
           redirectUrl = baseUrl +
             urlParams +
+            `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BUser%5D%20Underage%20User%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
             `&tf_description=${encodeURIComponent(`The user in question is under the legal age of 13 to play VRChat. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
@@ -151,6 +158,7 @@ app.get('/vrchat-report', async (req, res) => {
         case 'pedo':
           redirectUrl = baseUrl +
             urlParams +
+              `&tf_41536076540179=accountreport_issue_not_described` +
               `&tf_subject=%5BUser%5D%20Pedophelia%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
               `&tf_description=${encodeURIComponent(`I encountered a user exhibiting predatory behavior toward minors in VRChat. They made inappropriate comments and attempted to engage in grooming behavior. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
               `Offending User ID: ${entry.id}<br>` +
@@ -169,6 +177,7 @@ app.get('/vrchat-report', async (req, res) => {
         case 'badusername':
           redirectUrl = baseUrl +
             urlParams +
+            `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BUser%5D%20Bad%20Username%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
             `&tf_description=${encodeURIComponent(`I encountered a user with a bad username. This username contains offensive and inappropriate content, including references that violate community standards.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
@@ -187,6 +196,7 @@ app.get('/vrchat-report', async (req, res) => {
         case 'crasher':
           redirectUrl = baseUrl +
             urlParams +
+            `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BUser%5D%20Crasher%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
             `&tf_description=${encodeURIComponent(`The User in question disrupts the gameplay by crashing/lagging the client of the users. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
