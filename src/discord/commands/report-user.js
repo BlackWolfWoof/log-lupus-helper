@@ -1,8 +1,9 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, getAvatar, getUserGroups, sanitizeText, escapeMarkdown, getCurrentUser, getUser, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
+import { vrchat } from '../../vrchat/authentication.ts';
 
 const discord = new SlashCommandBuilder()
   .setName("report-user")
@@ -68,10 +69,11 @@ async function execute(interaction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral }) // Preventing timeouts of the command
 
   // VRChat user info
-  const getServiceAccount = await getCurrentUser()
+  // const getServiceAccount = await getCurrentUser()
+  const getServiceAccount = await vrchat.getCurrentUser()
 
   // Security settings so you cannot get info about your own avatar. This would give people the ability to query avatars from the logged in user otherwise
-  if (getServiceAccount.id === userId) {
+  if (getServiceAccount.data.id === userId) {
     await interaction.editReply({
       content: `⚠️ For security reasons this user cannot be reported.`,
       flags: MessageFlags.Ephemeral
@@ -81,7 +83,10 @@ async function execute(interaction) {
 
 
   // Get User and its groups and see if user is valid
-  const userInfo = await getUser(userId);
+  // const userInfo = await getUser(userId);
+  const userInfo = await vrchat.getUser({
+    path: { userId: userId }
+  })
   if (userInfo.error) {
     await interaction.editReply({
       content: `❌ Input was not a user-id. Make sure the user-id has the following format. Here an example: \`usr_a310c385-72f9-4a4b-8ba0-75b05b1317b3\``,
@@ -92,34 +97,37 @@ async function execute(interaction) {
 
   // Check if user has already been termed
   // If user has robot avi, i can't track the takedown status as thats the way this is done
-  if (userInfo.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file' && !force) {
+  if (userInfo.data.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file' && !force) {
     await interaction.editReply({
       content: `❌ The user was already terminated or currently has the [Robot](<https://vrchat.com/home/avatar/avtr_c38a1615-5bf5-42b4-84eb-a8b6c37cbd11>) avatar equipped.\nThe way this tool detects the termination is, if someone has the avatar.\nReasons why someone has that avatar:\n- Terminated/Banned\n- Avatar they used got removed/set private\n- User switched into the avatar manually`,
       flags: MessageFlags.Ephemeral
     })
     return
   }
-  const userGroups = await getUserGroups(userId);
+  // const userGroups = await getUserGroups(userId);
+  const userGroups = await vrchat.getUserGroups({
+    path: { userId: userId }
+  })
 
-  const bio = escapeMarkdown(sanitizeText(userInfo?.bio)) || "No bio available.";
-  const profilePic = userInfo?.profilePicOverrideThumbnail || userInfo?.currentAvatarThumbnailImageUrl || null;
-  const status = escapeMarkdown(sanitizeText(userInfo?.statusDescription)) || "No status available."
+  const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "No bio available.";
+  const profilePic = userInfo.data?.profilePicOverrideThumbnail || userInfo.data?.currentAvatarThumbnailImageUrl || null;
+  const status = escapeMarkdown(sanitizeText(userInfo.data?.statusDescription)) || "No status available."
 
   // Combine age verification and age status
   let ageIcon = "✖️"; // Default: Not Verified
-  if (userInfo?.ageVerified) ageIcon = "✔️";
-  if (userInfo?.ageVerificationStatus === "18+") ageIcon = "🔞";
+  if (userInfo.data?.ageVerified) ageIcon = "✔️";
+  if (userInfo.data?.ageVerificationStatus === "18+") ageIcon = "🔞";
 
   // Format date_joined
   let joinedTimestamp = "Unknown";
-  if (userInfo?.date_joined) {
-    const joinedDate = new Date(userInfo.date_joined);
+  if (userInfo.data?.date_joined) {
+    const joinedDate = new Date(userInfo.data.date_joined);
     const discordTimestamp = `<t:${Math.floor(joinedDate.getTime() / 1000)}:F> (<t:${Math.floor(joinedDate.getTime() / 1000)}:R>)`;
     joinedTimestamp = discordTimestamp;
   }
 
   // Split group names into multiple fields if needed
-  const groupNames = userGroups?.map(group => group.name).filter(Boolean) || [];
+  const groupNames = userGroups.data?.map(group => group.name).filter(Boolean) || [];
   const groupFields = [];
   const maxFieldLength = 1024;
   const maxTotalLength = 4000; // its 6k but yea... i left some just in case
@@ -137,7 +145,7 @@ async function execute(interaction) {
     if (currentField.length + groupName.length + 2 > maxFieldLength) {
       // Check if we can add another field
       if (fieldCount < maxFields - 1 && totalLength + currentField.length <= maxTotalLength) {
-        groupFields.push({ name: `👥 Groups Joined (${userGroups.length})`, value: currentField, inline: false });
+        groupFields.push({ name: `👥 Groups Joined (${userGroups.data.length})`, value: currentField, inline: false });
         totalLength += currentField.length;
         fieldCount++;
         currentField = groupName;
@@ -161,18 +169,18 @@ async function execute(interaction) {
 
   // Add the last field if it contains data
   if (currentField && totalLength + currentField.length <= maxTotalLength) {
-    groupFields.push({ name: `👥 Groups Joined (${userGroups.length})`, value: currentField, inline: false });
+    groupFields.push({ name: `👥 Groups Joined (${userGroups.data.length})`, value: currentField, inline: false });
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(userInfo?.displayName)))
-    .setDescription(`\`\`\`${userInfo.id}\`\`\``)
-    .setURL(`https://vrchat.com/home/user/${userInfo.id}`)
-    .setColor(getUserTrustLevel(userInfo).trustColor)
+    .setTitle(sanitizeText(escapeMarkdown(userInfo.data?.displayName)))
+    .setDescription(`\`\`\`${userInfo.data.id}\`\`\``)
+    .setURL(`https://vrchat.com/home/user/${userInfo.data.id}`)
+    .setColor(getUserTrustLevel(userInfo.data).trustColor)
     .setImage(profilePic)
     .addFields(
       { name: "📰 Status", value: status, inline: false },
-      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.pronouns), inline: false },
+      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.data.pronouns), inline: false },
       { name: "📜 Bio", value: bio.length > 1024 ? bio.slice(0, 1021) + "..." : bio, inline: false },
       { name: "🧑‍🦲 Age Verification", value: ageIcon, inline: false },
       { name: "📅 Joined VRChat", value: joinedTimestamp, inline: false },
@@ -192,7 +200,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: sanitizeText(userInfo.displayName),
+      name: sanitizeText(userInfo.data.displayName),
       message: {
         embeds: [embed]
       },
@@ -242,7 +250,7 @@ async function execute(interaction) {
       discordChannelId: thread.id,
       type: type,
       submitter: interaction.user.id,
-      vrc: userInfo,
+      vrc: userInfo.data,
       tickets: [],
       force: force
     })

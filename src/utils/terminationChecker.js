@@ -1,9 +1,10 @@
 import './loadEnv.js'
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { avatarDb, userDb, countDb } from './quickdb.js'
-import { findChannelId, getAvatar, getUser } from './functions.js'
+import { findChannelId } from './functions.js'
 import { client } from '../discord/bot.js'
 import { EmbedBuilder } from 'discord.js'
+import { vrchat } from '../vrchat/authentication.ts'
 
 export async function checkTermination() {
   // Get all avatars
@@ -13,13 +14,20 @@ export async function checkTermination() {
   // Loop over avatars
   for (const entry of allAvatars) {
     try {
-      const refreshedAvatar = await getAvatar(entry.id)
+      // const refreshedAvatar = await getAvatar(entry.id)
+      const refreshedAvatar = await vrchat.getAvatar({
+        path: { avatarId: entry.id }
+      })
+
       // If avi gone
-      if (refreshedAvatar.error && refreshedAvatar.error.status_code === 404) {
+      if (refreshedAvatar.error && refreshedAvatar.error.response.status === 404) {
         // Avatar gone
         // logInfo`[terminationChecker]: Avi gone ${entry.id} - ${entry.value.vrc.name}`
         // If author has robot avi
-        const targetUser = await getUser(entry.value.vrc.authorId, false)
+        // const targetUser = await getUser(entry.value.vrc.authorId, false)
+        const targetUser = await vrchat.getUser({
+          path: { userId: entry.value.vrc.authorId }
+        })
         let thread;
         try {
           thread = client.channels.cache.get(entry.value.discordChannelId);
@@ -33,7 +41,7 @@ export async function checkTermination() {
         // Ping user that submitted
         const submitter = entry.value.submitter ? `<@${entry.value.submitter}>` : null
 
-        if (targetUser.error && targetUser.error.status_code === 404) {
+        if (targetUser.error && targetUser.error.response.status === 404) {
           // Unexpected error, remove from db and kill thread. Add function for this to terminate the watching
           logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} has been deleted and user went missing`)
 
@@ -57,7 +65,7 @@ export async function checkTermination() {
 
           continue // Continue with other avis
         }
-        if (targetUser.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
+        if (targetUser.data.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
           // User is maybe terminated.
           // For now, report this instantly, no grace period
           logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.name} has been deleted and user is termed`)
@@ -116,7 +124,10 @@ export async function checkTermination() {
   for (const entry of allUsers) {
     if (entry.value.force) continue // Skip "force" and do not use termination checks on them
     try {
-      const refreshedUser = await getUser(entry.id, false)
+      // const refreshedUser = await getUser(entry.id, false)
+      const refreshedUser = await vrchat.getUser({
+        path: { userId: entry.id }
+      })
       // If author has robot avi
       let thread;
       try {
@@ -130,7 +141,7 @@ export async function checkTermination() {
 
       const submitter = entry.value.submitter ? `<@${entry.value.submitter}>` : null
 
-      if (refreshedUser.error && refreshedUser.error.status_code === 404) {
+      if (refreshedUser.error && refreshedUser.error.response.status === 404) {
         // Unexpected error, remove from db and kill thread. Add function for this to terminate the watching
         logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.displayName} user went missing`)
 
@@ -153,7 +164,7 @@ export async function checkTermination() {
 
         continue // Continue with other users
       }
-      if (refreshedUser.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
+      if (refreshedUser.data.currentAvatarImageUrl === 'https://api.vrchat.cloud/api/1/file/file_0e8c4e32-7444-44ea-ade4-313c010d4bae/1/file') {
         // User is maybe terminated.
         // For now, report this instantly, no grace period
         logDebug(`[terminationChecker]: ${entry.id} - ${entry.value.vrc.displayName} user is termed/banned`)

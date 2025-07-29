@@ -11,7 +11,7 @@ const client = new Client({
     GatewayIntentBits.Guilds,
   ],
   rest: {
-    api: 'https://discordproxy.local.blackwolfwoof.com/api',
+    api: 'http://192.168.178.207:8189/api',
   }
 })
 

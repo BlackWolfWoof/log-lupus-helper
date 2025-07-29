@@ -22,7 +22,7 @@ async function loadScripts(dirPath, basePath) {
       // Skip the discord folder since it has a separate handler
       if (file.isDirectory() && file.name !== 'discord') {
         await loadScripts(fullPath, basePath);
-      } else if (file.isFile() && file.name.endsWith('.js')) {
+      } else if (file.isFile() && file.name.endsWith('.js') || file.name.endsWith('.ts')) {
         await import(pathToFileURL(fullPath));
 
         // Get the relative path from the base src directory

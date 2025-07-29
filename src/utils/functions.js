@@ -1,7 +1,7 @@
 // A list of functions exported and re-used everyehere
 import './loadEnv.js'
-import { testSession } from '../vrchat/authentication.js'
-import { vrchatFetch } from '../vrchat/apiQueue.js'
+import { vrchat } from '../vrchat/authentication.ts'
+// import { vrchatFetch } from '../vrchat/apiQueue.js'
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { flushCache, hasCache, deleteCache, getCache, setCache } from './cache.js'
 import { PermissionsBitField, ChannelType } from 'discord.js'

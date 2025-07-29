@@ -1,8 +1,9 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, getAvatar, getUserGroups, sanitizeText, escapeMarkdown, getCurrentUser, getUser, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
+import { vrchat } from '../../vrchat/authentication.ts';
 
 const discord = new SlashCommandBuilder()
   .setName("report-avatar")
@@ -57,11 +58,15 @@ async function execute(interaction) {
   await interaction.deferReply({ flags: MessageFlags.Ephemeral }) // Preventing timeouts of the command
 
   // VRChat avatar info
-  const getServiceAccount = await getCurrentUser()
-  const avatar = await getAvatar(avatarId)
+  // const getServiceAccount = await getCurrentUser()
+  const getServiceAccount = await vrchat.getCurrentUser()
+  // const avatar = await getAvatar(avatarId)
+  const avatar = await vrchat.getAvatar({
+    path: { avatarId: avatarId }
+  })
 
   if (avatar.error) {
-    switch (avatar.error.status_code) {
+    switch (avatar.error.response.status) {
       case 404:
         await interaction.editReply({
           content: `❌ The avatar does not exist or has already been deleted.`,
@@ -75,7 +80,7 @@ async function execute(interaction) {
   }
 
   // Security settings so you cannot get info about your own avatar. This would give people the ability to query avatars from the logged in user otherwise
-  if (getServiceAccount.id === avatar.authorId) {
+  if (getServiceAccount.data.id === avatar.data.authorId) {
     await interaction.editReply({
       content: `⚠️ For security reasons, the avatar of this user cannot be gotten.`,
       flags: MessageFlags.Ephemeral
@@ -83,7 +88,7 @@ async function execute(interaction) {
     return
   }
 
-  if (type === "nsfw" && Array.isArray(avatar.tags) && avatar.tags.includes("content_sex")) {
+  if (type === "nsfw" && Array.isArray(avatar.data.tags) && avatar.data.tags.includes("content_sex")) {
     await interaction.editReply({
       content: `❌ The avatar is marked as NSFW and can therefor not be reported for being NSFW.`,
       flags: MessageFlags.Ephemeral
@@ -91,28 +96,34 @@ async function execute(interaction) {
     return
   }
 
-  const userInfo = await getUser(avatar.authorId);
-  const userGroups = await getUserGroups(avatar.authorId);
+  // const userInfo = await getUser(avatar.data.authorId);
+  const userInfo = await vrchat.getUser({
+    path: { userId: avatar.data.authorId }
+  })
+  // const userGroups = await getUserGroups(avatar.data.authorId);
+  const userGroups = await vrchat.getUserGroups({
+    path: { userId: avatar.data.authorId }
+  })
 
-  const bio = escapeMarkdown(sanitizeText(userInfo?.bio)) || "No bio available.";
-  const profilePic = userInfo?.profilePicOverrideThumbnail || userInfo?.currentAvatarThumbnailImageUrl || null;
-  const status = escapeMarkdown(sanitizeText(userInfo?.statusDescription)) || "No status available."
+  const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "No bio available.";
+  const profilePic = userInfo.data?.profilePicOverrideThumbnail || userInfo.data?.currentAvatarThumbnailImageUrl || null;
+  const status = escapeMarkdown(sanitizeText(userInfo.data?.statusDescription)) || "No status available."
 
   // Combine age verification and age status
   let ageIcon = "✖️"; // Default: Not Verified
-  if (userInfo?.ageVerified) ageIcon = "✔️"; 
-  if (userInfo?.ageVerificationStatus === "+18") ageIcon = "🔞";
+  if (userInfo.data?.ageVerified) ageIcon = "✔️"; 
+  if (userInfo.data?.ageVerificationStatus === "+18") ageIcon = "🔞";
 
   // Format date_joined
   let joinedTimestamp = "Unknown";
-  if (userInfo?.date_joined) {
-    const joinedDate = new Date(userInfo.date_joined);
+  if (userInfo.data?.date_joined) {
+    const joinedDate = new Date(userInfo.data.date_joined);
     const discordTimestamp = `<t:${Math.floor(joinedDate.getTime() / 1000)}:F> (<t:${Math.floor(joinedDate.getTime() / 1000)}:R>)`;
     joinedTimestamp = discordTimestamp;
   }
 
   // Split group names into multiple fields if needed
-  const groupNames = userGroups?.map(group => group.name).filter(Boolean) || [];
+  const groupNames = userGroups.data?.map(group => group.name).filter(Boolean) || [];
   const groupFields = [];
   const maxFieldLength = 1024;
   const maxTotalLength = 4000; // its 6k but yea... i left some just in case
@@ -130,7 +141,7 @@ async function execute(interaction) {
     if (currentField.length + groupName.length + 2 > maxFieldLength) {
       // Check if we can add another field
       if (fieldCount < maxFields - 1 && totalLength + currentField.length <= maxTotalLength) {
-        groupFields.push({ name: `👥 Groups Joined (${userGroups.length})`, value: currentField, inline: false });
+        groupFields.push({ name: `👥 Groups Joined (${userGroups.data.length})`, value: currentField, inline: false });
         totalLength += currentField.length;
         fieldCount++;
         currentField = groupName;
@@ -154,18 +165,18 @@ async function execute(interaction) {
 
   // Add the last field if it contains data
   if (currentField && totalLength + currentField.length <= maxTotalLength) {
-    groupFields.push({ name: `👥 Groups Joined (${userGroups.length})`, value: currentField, inline: false });
+    groupFields.push({ name: `👥 Groups Joined (${userGroups.data.length})`, value: currentField, inline: false });
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(userInfo?.displayName)))
-    .setDescription(`\`\`\`${userInfo.id}\`\`\``)
-    .setURL(`https://vrchat.com/home/user/${userInfo.id}`)
-    .setColor(getUserTrustLevel(userInfo).trustColor)
+    .setTitle(sanitizeText(escapeMarkdown(userInfo.data?.displayName)))
+    .setDescription(`\`\`\`${userInfo.data.id}\`\`\``)
+    .setURL(`https://vrchat.com/home/user/${userInfo.data.id}`)
+    .setColor(getUserTrustLevel(userInfo.data).trustColor)
     .setImage(profilePic)
     .addFields(
       { name: "📰 Status", value: status, inline: false },
-      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.pronouns), inline: false },
+      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.data.pronouns), inline: false },
       { name: "📜 Bio", value: bio.length > 1024 ? bio.slice(0, 1021) + "..." : bio, inline: false },
       { name: "🧑‍🦲 Age Verification", value: ageIcon, inline: false },
       { name: "📅 Joined VRChat", value: joinedTimestamp, inline: false },
@@ -177,19 +188,19 @@ async function execute(interaction) {
     });
 
   // Avatar
-  const avatarCreatedAt = Math.floor(new Date(avatar.created_at).getTime() / 1000);
-  const avatarUpdatedAt = Math.floor(new Date(avatar.updated_at).getTime() / 1000);
+  const avatarCreatedAt = Math.floor(new Date(avatar.data.created_at).getTime() / 1000);
+  const avatarUpdatedAt = Math.floor(new Date(avatar.data.updated_at).getTime() / 1000);
   const embedAvi = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(avatar.name)))
-    .setURL(`https://vrchat.com/home/avatar/${avatar.id}`)
-    .setImage(avatar.thumbnailImageUrl || null)
-    .setDescription(`\`\`\`${avatar.id}\`\`\``)
+    .setTitle(sanitizeText(escapeMarkdown(avatar.data.name)))
+    .setURL(`https://vrchat.com/home/avatar/${avatar.data.id}`)
+    .setImage(avatar.data.thumbnailImageUrl || null)
+    .setDescription(`\`\`\`${avatar.data.id}\`\`\``)
     .addFields(
-      { name: "Description", value: escapeMarkdown(avatar.description).slice(0, 1024), inline: false },
-      { name: "Styles", value: `Primary: ${avatar.styles.primary || "*None*"}, Secondary: ${avatar.styles.secondary || "*None*"}`, inline: false },
+      { name: "Description", value: escapeMarkdown(avatar.data.description).slice(0, 1024), inline: false },
+      { name: "Styles", value: `Primary: ${avatar.data.styles.primary || "*None*"}, Secondary: ${avatar.data.styles.secondary || "*None*"}`, inline: false },
       { name: "Date", value: `Created at: <t:${avatarCreatedAt}> (<t:${avatarUpdatedAt}:R>)\nUpdated at: <t:${avatarUpdatedAt}:R> (<t:${avatarUpdatedAt}>)`, inline: false },
-      { name: "Tags", value: (avatar.tags.length ? avatar.tags.map(t => toTitleCase(t.split("_").pop())).join(", ") : "*None*"), inline: false },
-      { name: "Acknowledgements", value: avatar.acknowledgements ? sanitizeText(escapeMarkdown(avatar.acknowledgements)).slice(0, 1024) : "*None*", inline: false },
+      { name: "Tags", value: (avatar.data.tags.length ? avatar.data.tags.map(t => toTitleCase(t.split("_").pop())).join(", ") : "*None*"), inline: false },
+      { name: "Acknowledgements", value: avatar.data.acknowledgements ? sanitizeText(escapeMarkdown(avatar.data.acknowledgements)).slice(0, 1024) : "*None*", inline: false },
     )
 
   let channel = client.channels.cache.get(process.env["CHANNEL_ID_AVATAR"]);
@@ -199,7 +210,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: `${avatar.name} (by ${sanitizeText(userInfo?.displayName)})`,
+      name: `${avatar.data.name} (by ${sanitizeText(userInfo.data?.displayName)})`,
       message: {
         embeds: [embed, embedAvi]
       },
@@ -234,12 +245,12 @@ async function execute(interaction) {
 
 
     // Save to db
-    await avatarDb.set(avatar.id, {
+    await avatarDb.set(avatar.data.id, {
       discordChannelId: thread.id,
       type: type,
-      authorDisplayName: userInfo.displayName,
+      authorDisplayName: userInfo.data.displayName,
       submitter: interaction.user.id,
-      vrc: avatar,
+      vrc: avatar.data,
       tickets: []
     })
     await thread.message
