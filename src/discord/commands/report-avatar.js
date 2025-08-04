@@ -4,7 +4,7 @@ import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrust
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
 import { vrchat } from '../../vrchat/authentication.ts';
-import { getCurrentUser, getAvatar, getUserGroups } from '../../utils/cache.js'
+import { getCurrentUser, getAvatar, getUserGroups, getUser } from '../../utils/cache.js'
 
 const discord = new SlashCommandBuilder()
   .setName("report-avatar")
@@ -60,7 +60,7 @@ async function execute(interaction) {
 
   // VRChat avatar info
   // const getServiceAccount = await getCurrentUser()
-  const getServiceAccount = await getCurrentUser()
+  const getServiceAccount = await getCurrentUser({}, 7)
   // const avatar = await getAvatar(avatarId)
   const avatar = await getAvatar({
     path: { avatarId: avatarId }

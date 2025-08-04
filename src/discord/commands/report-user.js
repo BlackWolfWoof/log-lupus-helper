@@ -3,7 +3,7 @@ import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType
 import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
-import { vrchat } from '../../vrchat/authentication.ts';
+import { getCurrentUser, getUser, getUserGroups } from '../../utils/cache.js'
 
 const discord = new SlashCommandBuilder()
   .setName("report-user")
@@ -70,7 +70,7 @@ async function execute(interaction) {
 
   // VRChat user info
   // const getServiceAccount = await getCurrentUser()
-  const getServiceAccount = await vrchat.getCurrentUser()
+  const getServiceAccount = await getCurrentUser({}, 7)
 
   // Security settings so you cannot get info about your own avatar. This would give people the ability to query avatars from the logged in user otherwise
   if (getServiceAccount.data.id === userId) {
@@ -84,9 +84,9 @@ async function execute(interaction) {
 
   // Get User and its groups and see if user is valid
   // const userInfo = await getUser(userId);
-  const userInfo = await vrchat.getUser({
+  const userInfo = await getUser({
     path: { userId: userId }
-  })
+  }, 7, false)
   if (userInfo.error) {
     await interaction.editReply({
       content: `❌ Input was not a user-id. Make sure the user-id has the following format. Here an example: \`usr_a310c385-72f9-4a4b-8ba0-75b05b1317b3\``,
@@ -105,9 +105,9 @@ async function execute(interaction) {
     return
   }
   // const userGroups = await getUserGroups(userId);
-  const userGroups = await vrchat.getUserGroups({
+  const userGroups = await getUserGroups({
     path: { userId: userId }
-  })
+  }, 7, false)
 
   const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "No bio available.";
   const profilePic = userInfo.data?.profilePicOverrideThumbnail || userInfo.data?.currentAvatarThumbnailImageUrl || null;
