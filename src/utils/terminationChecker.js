@@ -4,7 +4,7 @@ import { avatarDb, userDb, countDb } from './quickdb.js'
 import { findChannelId } from './functions.js'
 import { client } from '../discord/bot.js'
 import { EmbedBuilder } from 'discord.js'
-import { vrchat } from '../vrchat/authentication.ts'
+import { getAvatar, getUser } from './cache.js'
 
 export async function checkTermination() {
   // Get all avatars
@@ -15,9 +15,9 @@ export async function checkTermination() {
   for (const entry of allAvatars) {
     try {
       // const refreshedAvatar = await getAvatar(entry.id)
-      const refreshedAvatar = await vrchat.getAvatar({
+      const refreshedAvatar = await getAvatar({
         path: { avatarId: entry.id }
-      })
+      }, 6, false)
 
       // If avi gone
       if (refreshedAvatar.error && refreshedAvatar.error.response.status === 404) {
@@ -25,9 +25,9 @@ export async function checkTermination() {
         // logInfo`[terminationChecker]: Avi gone ${entry.id} - ${entry.value.vrc.name}`
         // If author has robot avi
         // const targetUser = await getUser(entry.value.vrc.authorId, false)
-        const targetUser = await vrchat.getUser({
+        const targetUser = await getUser({
           path: { userId: entry.value.vrc.authorId }
-        })
+        }, 6, false)
         let thread;
         try {
           thread = client.channels.cache.get(entry.value.discordChannelId);
@@ -125,9 +125,9 @@ export async function checkTermination() {
     if (entry.value.force) continue // Skip "force" and do not use termination checks on them
     try {
       // const refreshedUser = await getUser(entry.id, false)
-      const refreshedUser = await vrchat.getUser({
+      const refreshedUser = await getUser({
         path: { userId: entry.id }
-      })
+      }, 5, false)
       // If author has robot avi
       let thread;
       try {

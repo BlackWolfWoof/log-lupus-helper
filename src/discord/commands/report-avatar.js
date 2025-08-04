@@ -4,6 +4,7 @@ import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrust
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
 import { vrchat } from '../../vrchat/authentication.ts';
+import { getCurrentUser, getAvatar, getUserGroups } from '../../utils/cache.js'
 
 const discord = new SlashCommandBuilder()
   .setName("report-avatar")
@@ -59,11 +60,11 @@ async function execute(interaction) {
 
   // VRChat avatar info
   // const getServiceAccount = await getCurrentUser()
-  const getServiceAccount = await vrchat.getCurrentUser()
+  const getServiceAccount = await getCurrentUser()
   // const avatar = await getAvatar(avatarId)
-  const avatar = await vrchat.getAvatar({
+  const avatar = await getAvatar({
     path: { avatarId: avatarId }
-  })
+  }, 7, false)
 
   if (avatar.error) {
     switch (avatar.error.response.status) {
@@ -97,13 +98,13 @@ async function execute(interaction) {
   }
 
   // const userInfo = await getUser(avatar.data.authorId);
-  const userInfo = await vrchat.getUser({
+  const userInfo = await getUser({
     path: { userId: avatar.data.authorId }
-  })
+  }, 7, false)
   // const userGroups = await getUserGroups(avatar.data.authorId);
-  const userGroups = await vrchat.getUserGroups({
+  const userGroups = await getUserGroups({
     path: { userId: avatar.data.authorId }
-  })
+  }, 7, false)
 
   const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "No bio available.";
   const profilePic = userInfo.data?.profilePicOverrideThumbnail || userInfo.data?.currentAvatarThumbnailImageUrl || null;
@@ -191,7 +192,7 @@ async function execute(interaction) {
   const avatarCreatedAt = Math.floor(new Date(avatar.data.created_at).getTime() / 1000);
   const avatarUpdatedAt = Math.floor(new Date(avatar.data.updated_at).getTime() / 1000);
   const embedAvi = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(avatar.data.name)))
+    .setTitle(sanitizeText(escapeMarkdown(avatar.data.name || "N/A")))
     .setURL(`https://vrchat.com/home/avatar/${avatar.data.id}`)
     .setImage(avatar.data.thumbnailImageUrl || null)
     .setDescription(`\`\`\`${avatar.data.id}\`\`\``)
@@ -210,7 +211,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: `${avatar.data.name} (by ${sanitizeText(userInfo.data?.displayName)})`,
+      name: `${avatar.data.name || "N/A"} (by ${sanitizeText(userInfo.data?.displayName)})`,
       message: {
         embeds: [embed, embedAvi]
       },
