@@ -254,7 +254,7 @@ async function main () {
           await channelUser.setTopic(sharedMessage)
           await channelAvatar.setTopic(sharedMessage)
           await channelGroup.setTopic(sharedMessage)
-          // await channelWorld.setTopic(sharedMessage)
+          await channelWorld.setTopic(sharedMessage)
         } catch (error) {
           logError(`[schedules]: Something crashed when calculating the stats. ${error}`)
           console.error(error)
