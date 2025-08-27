@@ -199,3 +199,13 @@ export async function getUserGroups(object, priority = 5, useCache = true) {
     useCache
   );
 }
+
+export async function getWorld(object, priority = 5, useCache = true) {
+  return cachedPriorityQueueFetch(
+    `getWorld_${JSON.stringify(object)}`,
+    priority,
+    () => vrchat.getWorld(object),
+    3600,
+    useCache
+  );
+}

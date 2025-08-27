@@ -1,5 +1,5 @@
 import { MessageFlags } from 'discord.js';
-import { avatarDb, userDb } from '../../../utils/quickdb.js'
+import { avatarDb, userDb, groupDb, worldDb } from '../../../utils/quickdb.js'
 import { findChannelId } from '../../../utils/functions.js';
 import { logDebug, logInfo, logWarn, logError } from '../../../utils/logger.js'
 
@@ -13,6 +13,10 @@ async function execute(interaction) {
       await userDb.delete(entry.id)
     } else if (entry?.id && entry.id.includes('avtr_')) {
       await avatarDb.delete(entry.id)
+    } else if (entry?.id && entry.id.includes('grp_')) {
+    await groupDb.delete(entry.id)
+    } else if (entry?.id && entry.id.includes('wrld_')) {
+    await worldDb.delete(entry.id)
     } else {
       logWarn(`[button-close-post]: Entry was not found. Skipping deletion and closing thread.`)
     }

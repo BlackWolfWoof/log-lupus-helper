@@ -73,8 +73,7 @@ export async function processNewEmail() {
                   // Send email in thread
                   await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
                   await thread.edit({
-                    appliedTags: [process.env["DISCORD_USER_TICKET_TAG_ID"], process.env["DISCORD_AVATAR_TICKET_TAG_ID"]] // Replace with ticket open tag
-                    // appliedTags: Array.from(new Set([...thread.appliedTags, process.env["DISCORD_USER_TICKET_TAG_ID"], process.env["DISCORD_AVATAR_TICKET_TAG_ID"]])) // Only add tag, don't remove all other tags
+                    appliedTags: [process.env["DISCORD_USER_TICKET_TAG_ID"], process.env["DISCORD_AVATAR_TICKET_TAG_ID"], process.env["DISCORD_GROUP_TICKET_TAG_ID"], process.env["DISCORD_WORLD_TICKET_TAG_ID"]] // Replace with ticket open tag
                   })
                   // Save that we processed the email already
                   // Save that we now have an email
@@ -87,6 +86,10 @@ export async function processNewEmail() {
                   if (entry?.id && entry.id.includes('usr_')) {
                     await userDb.delete(entry.id)
                   } else if (entry?.id && entry.id.includes('avtr_')) {
+                    await avatarDb.delete(entry.id)
+                  } else if (entry?.id && entry.id.includes('grp_')) {
+                    await avatarDb.delete(entry.id)
+                  } else if (entry?.id && entry.id.includes('wrld_')) {
                     await avatarDb.delete(entry.id)
                   }
                 }

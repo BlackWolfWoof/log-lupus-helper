@@ -12,9 +12,11 @@ if (!fs.existsSync(dbPath)) {
 // Initialize the database
 const db = new QuickDB({ filePath: dbPath });
 
-const avatarDb = db.table("avatars")
 const userDb = db.table("users")
+const avatarDb = db.table("avatars")
+const groupDb = db.table("groups")
+const worldDb = db.table("worlds")
 const emailDb = db.table("emails")
 const countDb = db.table("count")
 
-export { avatarDb, userDb, emailDb, countDb };
+export { avatarDb, userDb, groupDb, worldDb, emailDb, countDb };

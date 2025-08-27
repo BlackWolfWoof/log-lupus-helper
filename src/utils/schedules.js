@@ -2,7 +2,8 @@ import './loadEnv.js'
 import { client } from '../discord/bot.js'
 import { checkTermination } from "./terminationChecker.js";
 import { emailConnection } from './mail.js'
-import { userDb, avatarDb, countDb } from './quickdb.js'
+import { snowflakeOlderThan, findChannelId } from './functions.js'
+import { userDb, avatarDb, groupDb, worldDb, countDb } from './quickdb.js'
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
 
 async function main () {
@@ -17,6 +18,63 @@ async function main () {
         while (!client.isReady()) await new Promise(res => setTimeout(res, 1000))
         await checkTermination()
         
+        // Close stuff due to inactivity (currently 90d)
+        try {
+          const allUsers = await userDb.all()
+          const allAvatars = await avatarDb.all()
+          const allGroups = await groupDb.all()
+          const allWorlds = await worldDb.all()
+
+          for (const allEntries of [allUsers, allAvatars, allGroups, allWorlds]) {
+            for (const entryBig of allEntries) {
+              const snowflake = entryBig.value.discordChannelId
+              // If snowflake is older than 90 days, stop tracking
+              if (snowflakeOlderThan(snowflake, 90)) {
+                // Archive the thread
+                try {
+                  const entry = await findChannelId(snowflake)
+                  if (entry?.id && entry.id.includes('usr_')) {
+                    await userDb.delete(entry.id)
+                  } else if (entry?.id && entry.id.includes('avtr_')) {
+                    await avatarDb.delete(entry.id)
+                  } else if (entry?.id && entry.id.includes('grp_')) {
+                    await groupDb.delete(entry.id)
+                  } else if (entry?.id && entry.id.includes('wrld_')) {
+                    await worldDb.delete(entry.id)
+                  } else {
+                    logWarn(`[schedules]: Entry was not found. Skipping deletion and closing thread.`)
+                  }
+
+                  let thread;
+                  try {
+                    thread = client.channels.cache.get(snowflake);
+                    if (!thread) thread = await client.channels.fetch(snowflake);
+                  } catch (error) {
+                    logWarn(`[schedules]: Channel no longer exists but is still in db. Removed entry`)
+                    continue
+                  }
+                  if (thread.archived) {
+                    await thread.setArchived(false, `Unarchived to edit tags`)
+                  }
+                  await thread.edit({
+                    appliedTags: []
+                  })
+                  await thread.setArchived(true, `Archived because too old`);
+                  logInfo(`[schedules]: Thread ${thread.id} - ${thread.name} was archived due to being too old.`)
+                  return
+                } catch (e) {
+                  console.error(e)
+                  logError(`[schedules]: Error: ${e}`)
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.error(e)
+          logWarn(`[schedules]: Error: ${e}`)
+        }
+
+        // Channel topic stuff
         try {
           // Edit channel with stats
           let channelUser = client.channels.cache.get(process.env["CHANNEL_ID_USER"]);
