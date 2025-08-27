@@ -235,7 +235,7 @@ async function main () {
           `- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\`\n` +
           `- 🖼️Avatars: \`${allAvatars.length}\` 🎫\`${ticketsOpenAvatar}\`\n` +
           `- 👥Groups: \`${allGroups.length}\` 🎫\`${ticketsOpenGroup}\`\n` +
-          `- 🌍Worlds: \`${allAvatars.length}\` 🎫\`${ticketsOpenWorld}\`\n` +
+          `- 🌍Worlds: \`${allWorlds.length}\` 🎫\`${ticketsOpenWorld}\`\n` +
 
           `### Removed:\n` +
           `- 👤Users: \`${userTotal}\`\n` +
