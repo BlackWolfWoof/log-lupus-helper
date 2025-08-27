@@ -1,6 +1,6 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
 import { vrchat } from '../../vrchat/authentication.ts';
@@ -106,14 +106,14 @@ async function execute(interaction) {
     path: { userId: avatar.data.authorId }
   }, 7, false)
 
-  const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "No bio available.";
+  const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "";
   const profilePic = userInfo.data?.profilePicOverrideThumbnail || userInfo.data?.currentAvatarThumbnailImageUrl || null;
-  const status = escapeMarkdown(sanitizeText(userInfo.data?.statusDescription)) || "No status available."
+  const status = escapeMarkdown(sanitizeText(userInfo.data?.statusDescription)) || ""
 
   // Combine age verification and age status
   let ageIcon = "✖️"; // Default: Not Verified
   if (userInfo.data?.ageVerified) ageIcon = "✔️"; 
-  if (userInfo.data?.ageVerificationStatus === "+18") ageIcon = "🔞";
+  if (userInfo.data?.ageVerificationStatus === "18+") ageIcon = "🔞";
 
   // Format date_joined
   let joinedTimestamp = "Unknown";
@@ -169,6 +169,16 @@ async function execute(interaction) {
     groupFields.push({ name: `👥 Groups Joined (${userGroups.data.length})`, value: currentField, inline: false });
   }
 
+  const languagesString = (userInfo.data.tags && userInfo.data.tags.length > 0)
+    ? userInfo.data.tags
+      .filter(tag => tag.startsWith("language_"))             // only language tags
+      .map(tag => {
+        const code = tag.split("_")[1];                       // get 'deu', 'eng', etc.
+        return `:flag_${languageMappings[code] || code}:`;    // map to emoji
+      })
+      .join(" ")
+    : "N/A";
+
   const embed = new EmbedBuilder()
     .setTitle(sanitizeText(escapeMarkdown(userInfo.data?.displayName)))
     .setDescription(`\`\`\`${userInfo.data.id}\`\`\``)
@@ -177,14 +187,15 @@ async function execute(interaction) {
     .setImage(profilePic)
     .addFields(
       { name: "📰 Status", value: status, inline: false },
-      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.data.pronouns), inline: false },
+      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.data.pronouns) || "", inline: false },
+      { name: "🏳️ Languages", value: languagesString, inline: false },
       { name: "📜 Bio", value: bio.length > 1024 ? bio.slice(0, 1021) + "..." : bio, inline: false },
       { name: "🧑‍🦲 Age Verification", value: ageIcon, inline: false },
       { name: "📅 Joined VRChat", value: joinedTimestamp, inline: false },
       ...groupFields
     )
-    .setAuthor({
-      name: interaction.user.username,
+    .setFooter({
+      text: `Reported by "${interaction.user.username}"`,
       iconURL: interaction.user.displayAvatarURL({ dynamic: true, size: 512 })
     });
 
@@ -202,7 +213,7 @@ async function execute(interaction) {
       { name: "Date", value: `Created at: <t:${avatarCreatedAt}> (<t:${avatarUpdatedAt}:R>)\nUpdated at: <t:${avatarUpdatedAt}:R> (<t:${avatarUpdatedAt}>)`, inline: false },
       { name: "Tags", value: (avatar.data.tags.length ? avatar.data.tags.map(t => toTitleCase(t.split("_").pop())).join(", ") : "*None*"), inline: false },
       { name: "Acknowledgements", value: avatar.data.acknowledgements ? sanitizeText(escapeMarkdown(avatar.data.acknowledgements)).slice(0, 1024) : "*None*", inline: false },
-    )
+    );
 
   let channel = client.channels.cache.get(process.env["CHANNEL_ID_AVATAR"]);
   if (!channel) channel = await client.channels.fetch(process.env["CHANNEL_ID_AVATAR"]);
@@ -213,7 +224,7 @@ async function execute(interaction) {
     const thread = await channel.threads.create({
       name: `${avatar.data.name || "N/A"} (by ${sanitizeText(userInfo.data?.displayName)})`,
       message: {
-        embeds: [embed, embedAvi]
+        embeds: [embedAvi, embed]
       },
       appliedTags: [process.env["DISCORD_AVATAR_NOTICKET_TAG_ID"]]
     });
@@ -234,13 +245,17 @@ async function execute(interaction) {
       .setEmoji(`🗑️`);
 
     const row = new ActionRowBuilder().addComponents(buttonCloseThread)
+    // const buttonTerminated = new ButtonBuilder()
+    //   .setStyle(ButtonStyle.Danger)
+    //   .setCustomId('button-force-avatar-terminated')
+    //   .setEmoji('🪦');
     row.addComponents(buttonReport)
 
     const starterMessage = await thread.fetchStarterMessage({ force: true })
 
     // Now you can edit it
     const edit = await starterMessage.edit({
-      embeds: [embed, embedAvi],
+      embeds: [embedAvi, embed],
       components: [row]
     });
 

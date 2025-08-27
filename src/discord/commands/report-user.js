@@ -1,6 +1,6 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
 import { getCurrentUser, getUser, getUserGroups } from '../../utils/cache.js'
@@ -109,9 +109,9 @@ async function execute(interaction) {
     path: { userId: userId }
   }, 7, false)
 
-  const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "No bio available.";
+  const bio = escapeMarkdown(sanitizeText(userInfo.data?.bio)) || "";
   const profilePic = userInfo.data?.profilePicOverrideThumbnail || userInfo.data?.currentAvatarThumbnailImageUrl || null;
-  const status = escapeMarkdown(sanitizeText(userInfo.data?.statusDescription)) || "No status available."
+  const status = escapeMarkdown(sanitizeText(userInfo.data?.statusDescription)) || ""
 
   // Combine age verification and age status
   let ageIcon = "✖️"; // Default: Not Verified
@@ -172,6 +172,16 @@ async function execute(interaction) {
     groupFields.push({ name: `👥 Groups Joined (${userGroups.data.length})`, value: currentField, inline: false });
   }
 
+  const languagesString = (userInfo.data.tags && userInfo.data.tags.length > 0)
+    ? userInfo.data.tags
+      .filter(tag => tag.startsWith("language_"))
+      .map(tag => {
+        const code = tag.split("_")[1]; // get 'deu', 'eng', etc.
+        return `:flag_${languageMappings[code] || code}:`;
+      })
+      .join(" ")
+    : "N/A";
+
   const embed = new EmbedBuilder()
     .setTitle(sanitizeText(escapeMarkdown(userInfo.data?.displayName)))
     .setDescription(`\`\`\`${userInfo.data.id}\`\`\``)
@@ -180,14 +190,15 @@ async function execute(interaction) {
     .setImage(profilePic)
     .addFields(
       { name: "📰 Status", value: status, inline: false },
-      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.data.pronouns), inline: false },
+      { name: "➕ Pronouns", value: escapeMarkdown(userInfo.data?.pronouns) || "", inline: false },
+      { name: "🏳️ Languages", value: languagesString, inline: false },
       { name: "📜 Bio", value: bio.length > 1024 ? bio.slice(0, 1021) + "..." : bio, inline: false },
       { name: "🧑‍🦲 Age Verification", value: ageIcon, inline: false },
       { name: "📅 Joined VRChat", value: joinedTimestamp, inline: false },
       ...groupFields
     )
-    .setAuthor({
-      name: interaction.user.username,
+    .setFooter({
+      text: `Reported by "${interaction.user.username}"`,
       iconURL: interaction.user.displayAvatarURL({ dynamic: true, size: 512 })
     });
 
@@ -224,16 +235,12 @@ async function execute(interaction) {
 
     const row = new ActionRowBuilder().addComponents(buttonCloseThread)
 
-    // If force is set, add more buttons
-    if (force) {
-      const buttonTerminated = new ButtonBuilder()
-        .setStyle(ButtonStyle.Danger)
-        .setCustomId('button-force-user-terminated')
-        .setEmoji('🪦');
+    const buttonTerminated = new ButtonBuilder()
+      .setStyle(ButtonStyle.Danger)
+      .setCustomId('button-force-user-terminated')
+      .setEmoji('🪦');
 
-        row.addComponents(buttonTerminated)
-    }
-
+    row.addComponents(buttonTerminated)
     row.addComponents(buttonReport)
 
     const starterMessage = await thread.fetchStarterMessage({ force: true })
