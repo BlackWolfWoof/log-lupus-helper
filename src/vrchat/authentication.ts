@@ -6,7 +6,7 @@ import { KeyvFile } from 'keyv-file';
 
 // Storage for data like 2fa and auth cookie
 export const keyv = new Keyv({
-  store: new KeyvFile({ filename: './data.json' })
+  store: new KeyvFile({ filename: '../shared-auth/loglupus_data.json' })
 });
 // console.log(keyv)
 

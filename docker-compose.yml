@@ -9,6 +9,8 @@ services:
       target: base
     volumes:
     - ./json.sqlite:/app/json.sqlite
+    - ../shared-auth/loglupus_data.json:/shared-auth/loglupus_data.json
+    - ./logs:/app/logs
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
