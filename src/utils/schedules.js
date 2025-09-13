@@ -192,19 +192,15 @@ async function main () {
               const nameOrValue = reasonNameMap.get(entry.id) || entry.id;
 
               if (entry.id.startsWith('user-')) {
-                  console.log(`${entry.id} - ${entry.value}`)
                   userTotal += entry.value;
                   breakdown.users[nameOrValue] = (breakdown.users[nameOrValue] || 0) + entry.value;
               } else if (entry.id.startsWith('avatar-')) {
-                  console.log(`${entry.id} - ${entry.value}`)
                   avatarTotal += entry.value;
                   breakdown.avatars[nameOrValue] = (breakdown.avatars[nameOrValue] || 0) + entry.value;
               } else if (entry.id.startsWith('group-')) {
-                  console.log(`${entry.id} - ${entry.value}`)
                   groupTotal += entry.value;
                   breakdown.groups[nameOrValue] = (breakdown.groups[nameOrValue] || 0) + entry.value;
               } else if (entry.id.startsWith('world-')) {
-                  console.log(`${entry.id} - ${entry.value}`)
                   worldTotal += entry.value;
                   breakdown.worlds[nameOrValue] = (breakdown.worlds[nameOrValue] || 0) + entry.value;
               }
