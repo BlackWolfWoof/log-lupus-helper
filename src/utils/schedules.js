@@ -83,8 +83,8 @@ async function main () {
           if (!channelAvatar) channelAvatar = await client.channels.fetch(channelId);
           let channelGroup = client.channels.cache.get(process.env["CHANNEL_ID_GROUP"]);
           if (!channelGroup) channelGroup = await client.channels.fetch(channelId);
-          // let channelWorld = client.channels.cache.get(process.env["CHANNEL_ID_WORLD"]);
-          // if (!channelWorld) channelWorld = await client.channels.fetch(channelId);
+          let channelWorld = client.channels.cache.get(process.env["CHANNEL_ID_WORLD"]);
+          if (!channelWorld) channelWorld = await client.channels.fetch(channelId);
 
           // Get all entries from channel channelUser and channelAvatar
           const allUsers = await userDb.all()

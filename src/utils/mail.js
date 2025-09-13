@@ -2,7 +2,7 @@ import './loadEnv.js'
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
-import { emailDb, avatarDb, userDb } from './quickdb.js'
+import { avatarDb, userDb } from './quickdb.js'
 import { client as discordClient } from '../discord/bot.js'
 import { convert } from 'html-to-text'
 import { findChannelId, sleep, sha256Hash, addTicket, isTicketHashUsed } from './functions.js'
