@@ -1,6 +1,6 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings, shortenText } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
 import { getCurrentUser, getUser, getUserGroups } from '../../utils/cache.js'
@@ -37,6 +37,19 @@ const discord = new SlashCommandBuilder()
       .setDescription('If true, disables termination checking')
       .setRequired(false)
   );
+
+const categories = {
+  'user-racism': '🤬',
+  'user-nsfw': '🔞',
+  'user-child': '👶',
+  'user-pedo': '😻',
+  'user-media': '🖼️',
+  'user-selfharm': '🩸',
+  'user-badusername': '📛',
+  'user-crasher': '💥',
+  'user-other': '❔'
+}
+
 
 async function execute(interaction) {
   let userId = interaction.options.getString('user-id');
@@ -183,7 +196,7 @@ async function execute(interaction) {
     : "N/A";
 
   const embed = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(userInfo.data?.displayName)))
+    .setTitle(sanitizeText(escapeMarkdown(shortenText(userInfo.data?.displayName || "N/A"))))
     .setDescription(`\`\`\`${userInfo.data.id}\`\`\``)
     .setURL(`https://vrchat.com/home/user/${userInfo.data.id}`)
     .setColor(getUserTrustLevel(userInfo.data).trustColor)
@@ -211,7 +224,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: sanitizeText(userInfo.data.displayName),
+      name: `${categories[type]}${sanitizeText(shortenText(userInfo.data.displayName))}`,
       message: {
         embeds: [embed]
       },

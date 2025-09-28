@@ -140,41 +140,43 @@ async function main () {
 
           // Lookup tables for value → name
           const avatarReasons = [
-              { name: 'Crasher', value: 'avatar-crasher' },
-              { name: 'NSFW', value: 'avatar-nsfw' },
-              { name: 'Racist', value: 'avatar-racist' },
-              { name: 'Other reason', value: 'avatar-other' },
+              { name: '💥 Crasher', value: 'avatar-crasher' },
+              { name: '🔞 NSFW', value: 'avatar-nsfw' },
+              { name: '🤬 Racist', value: 'avatar-racist' },
+              { name: '❔ Other reason', value: 'avatar-other' },
           ];
 
           const userReasons = [
-              { name: 'Racist', value: 'user-racism' },
-              { name: 'NSFW avatar in public', value: 'user-nsfw' },
-              { name: 'Underage', value: 'user-child' },
-              { name: 'Pedophile', value: 'user-pedo' },
-              { name: 'Bad Sticker/Print', value: 'user-media' },
-              { name: 'Promoting Selfharm', value: 'user-selfharm' },
-              { name: 'Bad Username', value: 'user-badusername' },
-              { name: 'Crasher', value: 'user-crasher' },
-              { name: 'Other reason', value: 'user-other' },
+              { name: '🤬 Racist', value: 'user-racism' },
+              { name: '🔞 NSFW avatar in public', value: 'user-nsfw' },
+              { name: '👶 Underage', value: 'user-child' },
+              { name: '😻 Pedophile', value: 'user-pedo' },
+              { name: '🖼️ Bad Sticker/Print', value: 'user-media' },
+              { name: '🩸 Promoting Selfharm', value: 'user-selfharm' },
+              { name: '📛 Bad Username', value: 'user-badusername' },
+              { name: '💥 Crasher', value: 'user-crasher' },
+              { name: '❔ Other reason', value: 'user-other' },
           ];
+
           const groupReasons = [
-            { name: 'Racist', value: 'group-racism' },
-            { name: 'Pedophile', value: 'group-pedo' },
-            { name: 'Bad Banner/Icon', value: 'group-media' },
-            { name: 'Promoting Selfharm', value: 'group-selfharm' },
-            { name: 'Bad Groupname', value: 'group-badgroupname' },
-            { name: 'Crasher', value: 'group-crasher' },
-            { name: 'Other reason', value: 'group-other' }
+              { name: '🤬 Racist', value: 'group-racism' },
+              { name: '😻 Pedophile', value: 'group-pedo' },
+              { name: '🖼️ Bad Banner/Icon', value: 'group-media' },
+              { name: '🩸 Promoting Selfharm', value: 'group-selfharm' },
+              { name: '📛 Bad Groupname', value: 'group-badgroupname' },
+              { name: '💥 Crasher', value: 'group-crasher' },
+              { name: '❔ Other reason', value: 'group-other' }
           ];
-          const worldReasons= [
-            { name: 'Racist', value: 'world-racism' },
-            { name: 'Pedophile', value: 'world-pedo' },
-            { name: 'Bad Media', value: 'world-media' },
-            { name: 'Promoting Selfharm', value: 'world-selfharm' },
-            { name: 'Bad Worldname', value: 'world-badworldname' },
-            { name: 'Crasher', value: 'world-crasher' },
-            { name: 'Other reason', value: 'world-other' }
-          ]
+
+          const worldReasons = [
+              { name: '🤬 Racist', value: 'world-racism' },
+              { name: '😻 Pedophile', value: 'world-pedo' },
+              { name: '🖼️ Bad Media', value: 'world-media' },
+              { name: '🩸 Promoting Selfharm', value: 'world-selfharm' },
+              { name: '📛 Bad Worldname', value: 'world-badworldname' },
+              { name: '💥 Crasher', value: 'world-crasher' },
+              { name: '❔ Other reason', value: 'world-other' }
+          ];
 
           // Convert to maps for quick lookup
           const reasonNameMap = new Map([
@@ -233,7 +235,7 @@ async function main () {
           `- 👥Groups: \`${allGroups.length}\` 🎫\`${ticketsOpenGroup}\`\n` +
           `- 🌍Worlds: \`${allWorlds.length}\` 🎫\`${ticketsOpenWorld}\`\n` +
 
-          `### Removed:\n` +
+          `### Removed: \`${userTotal + avatarTotal + groupTotal + worldTotal}\`\n` +
           `- 👤Users: \`${userTotal}\`\n` +
           `${userLines}\n` +
           `- 🖼️Avatars: \`${avatarTotal}\`\n` +

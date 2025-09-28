@@ -1,6 +1,6 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings, shortenText } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { groupDb } from '../../utils/quickdb.js'
 import { getCurrentUser, getUser, getUserGroups, getGroup } from '../../utils/cache.js'
@@ -29,7 +29,17 @@ const discord = new SlashCommandBuilder()
         { name: 'Crasher', value: 'group-crasher' },
         { name: 'Other reason', value: 'group-other' }
       )
-  )
+  );
+
+const categories = {
+  'group-racism': '🤬',
+  'group-pedo': '😻',
+  'group-media': '🖼️',
+  'group-selfharm': '🩸',
+  'group-badgroupname': '📛',
+  'group-crasher': '💥',
+  'group-other': '❔'
+}
 
 async function execute(interaction) {
   let groupId = interaction.options.getString('group-id');
@@ -171,7 +181,7 @@ async function execute(interaction) {
   
   let embeds = []
   const embed1 = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(userInfo.data?.displayName)))
+    .setTitle(shortenText(sanitizeText(escapeMarkdown(userInfo.data?.displayName))))
     .setDescription(`\`\`\`${userInfo.data.id}\`\`\``)
     .setURL(`https://vrchat.com/home/user/${userInfo.data.id}`)
     .setColor(getUserTrustLevel(userInfo.data).trustColor)
@@ -214,7 +224,7 @@ async function execute(interaction) {
 
 
   const embed2 = new EmbedBuilder()
-  .setTitle(sanitizeText(escapeMarkdown(group.data?.name ||"N/A")))
+  .setTitle(shortenText(sanitizeText(escapeMarkdown(group.data?.name ||"N/A"))))
   .setThumbnail(group.data.iconUrl || "")
   .setDescription(`\`\`\`${group.data.id}\`\`\``)
   .setURL(`https://vrchat.com/home/group/${group.data.id}`)
@@ -235,7 +245,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: sanitizeText(group.data?.name ||"N/A"),
+      name: `${categories[type]}${sanitizeText(shortenText(group.data?.name)) ||"N/A"}`,
       message: {
         embeds: embeds
       },

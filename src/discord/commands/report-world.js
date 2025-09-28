@@ -1,6 +1,6 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, formatHumanNumber, toSafeJSON } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, formatHumanNumber, toSafeJSON, shortenText } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { worldDb } from '../../utils/quickdb.js'
 import { getCurrentUser, getUser, getUserGroups, getWorld } from '../../utils/cache.js'
@@ -30,6 +30,17 @@ const discord = new SlashCommandBuilder()
         { name: 'Other reason', value: 'world-other' }
       )
   )
+
+const categories = {
+  'world-racism': '🤬',
+  'world-pedo': '😻',
+  'world-media': '🖼️',
+  'world-selfharm': '🩸',
+  'world-badworldname': '📛',
+  'world-crasher': '💥',
+  'world-other': '❔'
+}
+
 
 async function execute(interaction) {
   let worldId = interaction.options.getString('world-id');
@@ -171,7 +182,7 @@ async function execute(interaction) {
   
   let embeds = []
   const embed1 = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(userInfo.data?.displayName)))
+    .setTitle(sanitizeText(escapeMarkdown(shortenText(userInfo.data?.displayName))))
     .setDescription(`\`\`\`${userInfo.data.id}\`\`\``)
     .setURL(`https://vrchat.com/home/user/${userInfo.data.id}`)
     .setColor(getUserTrustLevel(userInfo.data).trustColor)
@@ -222,7 +233,7 @@ async function execute(interaction) {
   if (description.length > 1024) description = description.slice(0, 1024 - suffix.length) + suffix;
 
   const embed2 = new EmbedBuilder()
-  .setTitle(sanitizeText(escapeMarkdown(world.data?.name ||"N/A")))
+  .setTitle(sanitizeText(escapeMarkdown(shortenText(world.data?.name) ||"N/A")))
   .setDescription(`\`\`\`${world.data.id}\`\`\``)
   .setURL(`https://vrchat.com/home/world/${world.data.id}`)
   .addFields(
@@ -241,7 +252,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: sanitizeText(world.data?.name ||"N/A"),
+      name: `${categories[type]}${sanitizeText(shortenText(world.data?.name) ||"N/A")}`,
       message: {
         embeds: embeds
       },

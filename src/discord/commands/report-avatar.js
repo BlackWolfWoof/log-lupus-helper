@@ -1,6 +1,6 @@
 import '../../utils/loadEnv.js'
 import { SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings } from '../../utils/functions.js';
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings, shortenText } from '../../utils/functions.js';
 import { client } from '../bot.js'
 import { userDb, avatarDb } from '../../utils/quickdb.js'
 import { vrchat } from '../../vrchat/authentication.ts';
@@ -28,6 +28,13 @@ const discord = new SlashCommandBuilder()
         { name: 'Other reason', value: 'avatar-other' },
       )
   );
+
+const categories = {
+  'avatar-crasher': '💥',
+  'avatar-nsfw': '🔞',
+  'avatar-racist': '🤬',
+  'avatar-other': '❔'
+}
 
 async function execute(interaction) {
   let avatarId = interaction.options.getString('avatar-id');
@@ -203,7 +210,7 @@ async function execute(interaction) {
   const avatarCreatedAt = Math.floor(new Date(avatar.data.created_at).getTime() / 1000);
   const avatarUpdatedAt = Math.floor(new Date(avatar.data.updated_at).getTime() / 1000);
   const embedAvi = new EmbedBuilder()
-    .setTitle(sanitizeText(escapeMarkdown(avatar.data.name || "N/A")))
+    .setTitle(sanitizeText(escapeMarkdown(shortenText(avatar.data.name) || "N/A")))
     .setURL(`https://vrchat.com/home/avatar/${avatar.data.id}`)
     .setImage(avatar.data.thumbnailImageUrl || null)
     .setDescription(`\`\`\`${avatar.data.id}\`\`\``)
@@ -222,7 +229,7 @@ async function execute(interaction) {
   if (channel) {
     // Create form thread
     const thread = await channel.threads.create({
-      name: `${avatar.data.name || "N/A"} (by ${sanitizeText(userInfo.data?.displayName)})`,
+      name: `${categories[type]}${shortenText(avatar.data.name) || "N/A"} (by ${sanitizeText(shortenText(userInfo.data?.displayName))})`,
       message: {
         embeds: [embedAvi, embed]
       },
