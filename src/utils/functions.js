@@ -8,6 +8,13 @@ import { PermissionsBitField, ChannelType } from 'discord.js'
 import { userDb, avatarDb, groupDb, worldDb } from './quickdb.js'
 import { MessageFlags } from 'discord.js'
 import crypto from 'crypto';
+import { 
+  TextDisplayBuilder, SeparatorBuilder, SeparatorSpacingSize, 
+  MediaGalleryBuilder, MediaGalleryItemBuilder, ButtonBuilder, 
+  ButtonStyle, ActionRowBuilder, ContainerBuilder 
+} from 'discord.js';
+import he from "he";
+const { decode } = he
 
 const wait = ms => new Promise(res => setTimeout(res, ms));
 
@@ -577,4 +584,82 @@ export function snowflakeOlderThan(snowflake, days) {
     const now = BigInt(Date.now());
     const threshold = BigInt(days) * 24n * 60n * 60n * 1000n; // days → ms
     return now - timestamp > threshold;
+}
+
+
+export function shortenText(text) {
+  return text.length > 16 ? text.slice(0, 48) + "..." : text;
+}
+
+
+/**
+   * Parses a VRChat Trust & Safety email into Discord.js components.
+   * Supports multiple images and removes image lines from the body.
+   * @param {string} title - The email title line (already decoded/escaped)
+   * @param {string} emailText - The full email text (including body and last ID)
+   * @returns {ContainerBuilder[]} Discord.js components array
+ */
+export function parseVrChatEmail(title, emailText) {
+  const lines = emailText.split('\n').map(l => l.trim());
+
+  // Extract ticket ID from title (#123456)
+  const ticketIdMatch = title.match(/#(\d+)/);
+  const ticketId = ticketIdMatch ? ticketIdMatch[1] : null;
+
+  const imageUrls = [];
+  const cleanedLines = [];
+
+  // Collect images and filter them out of the body
+  const imageRegex = /^\[(https?:\/\/[^\]]+)\]$/;
+  lines.forEach(line => {
+    const match = line.match(imageRegex);
+    if (match) {
+      imageUrls.push(match[1]);
+    } else {
+      cleanedLines.push(line);
+    }
+  });
+
+  // Extract last line ID (e.g., [ZEM73Z-NW99W])
+  const lastLineMatch = cleanedLines[cleanedLines.length - 1]?.match(/\[([^\]]+)\]/);
+  const lastId = lastLineMatch ? lastLineMatch[1] : '';
+
+  // Remove the last line from the body (we'll add it formatted later)
+  if (lastLineMatch) cleanedLines.pop();
+
+  // Rebuild the body
+  const bodyText = cleanedLines.join('\n');
+
+  // Build container
+  const container = new ContainerBuilder()
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`**${escapeMarkdown(decode(title))}**`)
+    )
+    .addSeparatorComponents(
+      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
+    );
+
+  if (imageUrls.length > 0) {
+    const gallery = new MediaGalleryBuilder();
+    imageUrls.forEach(url => gallery.addItems(new MediaGalleryItemBuilder().setURL(url)));
+    container.addMediaGalleryComponents(gallery);
+  }
+
+  container.addTextDisplayComponents(
+    new TextDisplayBuilder().setContent(`${escapeMarkdown(decode(bodyText))}\n\n-# [${lastId}]`)
+  );
+
+  if (ticketId) {
+    container.addActionRowComponents(
+      new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Link)
+          .setLabel("Open Ticket")
+          .setEmoji({ name: "🎫" })
+          .setURL(`https://help.vrchat.com/hc/en-us/requests/${ticketId}`)
+      )
+    );
+  }
+
+  return [container];
 }
