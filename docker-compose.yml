@@ -2,7 +2,7 @@ services:
   log-lupus-helper:
     container_name: log-lupus-helper
     image: log-lupus-helper
-    restart: no
+    restart: on-failure:1
     build:
       context: .
       dockerfile: Dockerfile
