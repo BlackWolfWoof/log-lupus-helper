@@ -69,12 +69,36 @@ app.get('/vrchat-report', async (req, res) => {
           `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
           `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`
         break
+        case "avatar-pedo":
+          redirectUrl = baseUrl +
+            urlParams +
+            `&tf_41536076540179=accountreport_issue_not_described` +
+            `&tf_subject=%5BAvatar%5D%20Pedophelia%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
+            `&tf_description=${encodeURIComponent(`The Avatar in question has content about endangering minors. The attachments may include media showcasing the avatar.<br><br>` +
+            `Avatar ID: ${entry.id}<br>` +
+            `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
+            `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
+            `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
+            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`
+        break
       case "avatar-crasher":
         redirectUrl = baseUrl +
           urlParams +
           `&tf_41536076540179=accountreport_issue_not_described` +
           `&tf_subject=%5BAvatar%5D%20Crasher%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
           `&tf_description=${encodeURIComponent(`The Avatar in question disrupts the gameplay by crashing/lagging the client of the users. The attachments may include media showcasing the avatar.<br><br>` +
+            `Avatar ID: ${entry.id}<br>` +
+            `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
+            `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
+            `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
+            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+        break
+      case "avatar-selfharm":
+        redirectUrl = baseUrl +
+          urlParams +
+          `&tf_41536076540179=accountreport_issue_not_described` +
+          `&tf_subject=%5BAvatar%5D%20Promoting%20Selfharm%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
+          `&tf_description=${encodeURIComponent(`The Avatar in question promotes suicide / self-harm. The attachments may include media showcasing the avatar.<br><br>` +
             `Avatar ID: ${entry.id}<br>` +
             `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
             `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +

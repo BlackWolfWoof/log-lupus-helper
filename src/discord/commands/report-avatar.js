@@ -23,7 +23,9 @@ const discord = new SlashCommandBuilder()
       .setRequired(true)
       .addChoices(
         { name: 'Crasher', value: 'avatar-crasher' },
+        { name: 'Pedophilia', value: 'avatar-pedo' },
         { name: 'NSFW', value: 'avatar-nsfw' },
+        { name: 'Promoting Selfharm', value: 'avatar-selfharm' },
         { name: 'Racist', value: 'avatar-racist' },
         { name: 'Other reason', value: 'avatar-other' },
       )
@@ -31,7 +33,9 @@ const discord = new SlashCommandBuilder()
 
 const categories = {
   'avatar-crasher': '💥',
+  'avatar-pedo': '😻',
   'avatar-nsfw': '🔞',
+  'avatar-selfharm': '🩸',
   'avatar-racist': '🤬',
   'avatar-other': '❔'
 }

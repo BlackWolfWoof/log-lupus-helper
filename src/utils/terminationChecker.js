@@ -269,6 +269,7 @@ async function checkTerminationWorlds() {
   const allWorlds = await worldDb.all()
   for (let entry of allWorlds) {
     entry = toSafeJSON(entry)
+    console.log(entry)
     try {
       const worldId = entry.value.vrc.id
       const submitter = entry.value.submitter ? `<@${entry.value.submitter}>` : null
