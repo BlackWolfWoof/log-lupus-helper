@@ -1,7 +1,7 @@
 import './loadEnv.js'
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { avatarDb, userDb, countDb, groupDb, worldDb } from './quickdb.js'
-import { findChannelId, toSafeJSON } from './functions.js'
+import { fromSafeJSON } from './functions.js'
 import { client } from '../discord/bot.js'
 import { EmbedBuilder } from 'discord.js'
 import { getAvatar, getUser, getGroup, getWorld } from './cache.js'
@@ -268,9 +268,8 @@ async function checkTerminationGroups() {
 async function checkTerminationWorlds() {
   const allWorlds = await worldDb.all()
   for (let entry of allWorlds) {
-    entry = toSafeJSON(entry)
-    console.log(entry)
     try {
+      entry.value.vrc = fromSafeJSON(entry.value.vrc)
       const worldId = entry.value.vrc.id
       const submitter = entry.value.submitter ? `<@${entry.value.submitter}>` : null
 
