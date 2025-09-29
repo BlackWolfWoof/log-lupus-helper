@@ -141,7 +141,9 @@ async function main () {
           // Lookup tables for value → name
           const avatarReasons = [
               { name: '💥 Crasher', value: 'avatar-crasher' },
+              { name: '😻 Pedophilia', value: 'avatar-pedo' },
               { name: '🔞 NSFW', value: 'avatar-nsfw' },
+              { name: '🩸 Selfharm', value: 'avatar-selfharm' },
               { name: '🤬 Racist', value: 'avatar-racist' },
               { name: '❔ Other reason', value: 'avatar-other' },
           ];

@@ -61,8 +61,8 @@ app.get('/vrchat-report', async (req, res) => {
         redirectUrl = baseUrl +
           urlParams +
           `&tf_41536076540179=accountreport_issue_not_described` +
-          `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20is%20missing%20content_sex%20tag%20%28Automated%20${channelId}%29` +
-          `&tf_description=${encodeURIComponent(`The Avatar in question has adult features but is missing the content_sex tag. The attachments may include media showcasing the avatar.<br><br>` +
+          `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%%20%28Automated%20${channelId}%29` +
+          `&tf_description=${encodeURIComponent(`The Avatar in question has adult features, like reproductive organs or genetalia. The attachments may include media showcasing the avatar.<br><br>` +
           `Avatar ID: ${entry.id}<br>` +
           `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
           `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
@@ -74,7 +74,7 @@ app.get('/vrchat-report', async (req, res) => {
             urlParams +
             `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BAvatar%5D%20Pedophelia%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
-            `&tf_description=${encodeURIComponent(`The Avatar in question has content about endangering minors. The attachments may include media showcasing the avatar.<br><br>` +
+            `&tf_description=${encodeURIComponent(`The Avatar in question has content about endangering minors or sexual exploitation of minors. The attachments may include media showcasing the avatar.<br><br>` +
             `Avatar ID: ${entry.id}<br>` +
             `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
             `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
