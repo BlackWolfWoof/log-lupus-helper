@@ -113,27 +113,43 @@ async function main () {
 
           // Count for open tickets. Resolved and not resolved
           let ticketsOpenUser = 0;
+          let ticketsOpenUserPending = 0;
           let ticketsOpenAvatar = 0;
+          let ticketsOpenAvatarPending = 0;
           let ticketsOpenGroup = 0;
+          let ticketsOpenGroupPending = 0;
           let ticketsOpenWorld = 0;
+          let ticketsOpenWorldPending = 0;
           for (const entry of allUsers) {
             if ((entry.value.tickets || []).length !== 0) {
               ticketsOpenUser++
+              if ((entry.value.tickets || []).length === 1) {
+                ticketsOpenUserPending++
+              }
             }
           }
           for (const entry of allAvatars) {
             if ((entry.value.tickets || []).length !== 0) {
               ticketsOpenAvatar++
+              if ((entry.value.tickets || []).length === 1) {
+                ticketsOpenAvatarPending++
+              }
             }
           }
           for (const entry of allGroups) {
             if ((entry.value.tickets || []).length !== 0) {
               ticketsOpenGroup++
+              if ((entry.value.tickets || []).length === 1) {
+                ticketsOpenGroupPending++
+              }
             }
           }
           for (const entry of allWorlds) {
             if ((entry.value.tickets || []).length !== 0) {
               ticketsOpenWorld++
+              if ((entry.value.tickets || []).length !== 0) {
+                ticketsOpenWorldPending++
+              }
             }
           }
 
@@ -231,11 +247,11 @@ async function main () {
           const sharedMessage = `## Use the \`/report-user\`... commands to create form posts.\n\n` +
 
           `### Tracked:\n` +
-          `- 🔢Total: \`${allUsers.length + allAvatars.length + allGroups.length + allWorlds.length}\`\n` +
-          `- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\`\n` +
-          `- 🖼️Avatars: \`${allAvatars.length}\` 🎫\`${ticketsOpenAvatar}\`\n` +
-          `- 👥Groups: \`${allGroups.length}\` 🎫\`${ticketsOpenGroup}\`\n` +
-          `- 🌍Worlds: \`${allWorlds.length}\` 🎫\`${ticketsOpenWorld}\`\n` +
+          `- 🔢Total: \`${allUsers.length + allAvatars.length + allGroups.length + allWorlds.length}\` 🎫\`${ticketsOpenUser + ticketsOpenAvatar + ticketsOpenGroup + ticketsOpenWorld}\` 🔍\`${ticketsOpenUserPending + ticketsOpenAvatarPending + ticketsOpenGroupPending + ticketsOpenWorldPending}\`\n` +
+          `- 👤Users: \`${allUsers.length}\` 🎫\`${ticketsOpenUser}\` 🔍\`${ticketsOpenUserPending}\`\n` +
+          `- 🖼️Avatars: \`${allAvatars.length}\` 🎫\`${ticketsOpenAvatar}\` 🔍\`${ticketsOpenAvatarPending}\`\n` +
+          `- 👥Groups: \`${allGroups.length}\` 🎫\`${ticketsOpenGroup}\` 🔍\`${ticketsOpenGroupPending}\`\n` +
+          `- 🌍Worlds: \`${allWorlds.length}\` 🎫\`${ticketsOpenWorld}\` 🔍\`${ticketsOpenWorldPending}\`\n` +
 
           `### Removed: \`${userTotal + avatarTotal + groupTotal + worldTotal}\`\n` +
           `- 👤Users: \`${userTotal}\`\n` +
