@@ -250,7 +250,7 @@ async function execute(interaction) {
 
     const buttonTerminated = new ButtonBuilder()
       .setStyle(ButtonStyle.Danger)
-      .setCustomId('button-force-user-terminated')
+      .setCustomId('button-force-terminated')
       .setEmoji('🪦');
 
     row.addComponents(buttonTerminated)

@@ -220,10 +220,10 @@ async function execute(interaction) {
     .setDescription(`\`\`\`${avatar.data.id}\`\`\``)
     .addFields(
       { name: "Description", value: escapeMarkdown(avatar.data.description).slice(0, 1024), inline: false },
-      { name: "Styles", value: `Primary: ${avatar.data.styles.primary || "*None*"}, Secondary: ${avatar.data.styles.secondary || "*None*"}`, inline: false },
+      { name: "Styles", value: `Primary: ${avatar.data.styles.primary || ""}, Secondary: ${avatar.data.styles.secondary || ""}`, inline: false },
       { name: "Date", value: `Created at: <t:${avatarCreatedAt}> (<t:${avatarUpdatedAt}:R>)\nUpdated at: <t:${avatarUpdatedAt}:R> (<t:${avatarUpdatedAt}>)`, inline: false },
-      { name: "Tags", value: (avatar.data.tags.length ? avatar.data.tags.map(t => toTitleCase(t.split("_").pop())).join(", ") : "*None*"), inline: false },
-      { name: "Acknowledgements", value: avatar.data.acknowledgements ? sanitizeText(escapeMarkdown(avatar.data.acknowledgements)).slice(0, 1024) : "*None*", inline: false },
+      { name: "Tags", value: (avatar.data.tags.length ? avatar.data.tags.map(t => toTitleCase(t.split("_").pop())).join(", ") : ""), inline: false },
+      { name: "Acknowledgements", value: avatar.data.acknowledgements ? sanitizeText(escapeMarkdown(avatar.data.acknowledgements)).slice(0, 1024) : "", inline: false },
     );
 
   let channel = client.channels.cache.get(process.env["CHANNEL_ID_AVATAR"]);
@@ -256,10 +256,13 @@ async function execute(interaction) {
       .setEmoji(`🗑️`);
 
     const row = new ActionRowBuilder().addComponents(buttonCloseThread)
-    // const buttonTerminated = new ButtonBuilder()
-    //   .setStyle(ButtonStyle.Danger)
-    //   .setCustomId('button-force-avatar-terminated')
-    //   .setEmoji('🪦');
+
+    const buttonTerminated = new ButtonBuilder()
+      .setStyle(ButtonStyle.Danger)
+      .setCustomId('button-force-terminated')
+      .setEmoji('🪦');
+
+    row.addComponents(buttonTerminated)
     row.addComponents(buttonReport)
 
     const starterMessage = await thread.fetchStarterMessage({ force: true })

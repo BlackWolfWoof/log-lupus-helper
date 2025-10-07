@@ -269,12 +269,12 @@ async function execute(interaction) {
 
     const row = new ActionRowBuilder().addComponents(buttonCloseThread)
 
-    // const buttonTerminated = new ButtonBuilder()
-    //   .setStyle(ButtonStyle.Danger)
-    //   .setCustomId('button-force-group-terminated')
-    //   .setEmoji('🪦');
+    const buttonTerminated = new ButtonBuilder()
+      .setStyle(ButtonStyle.Danger)
+      .setCustomId('button-force-terminated')
+      .setEmoji('🪦');
 
-    // row.addComponents(buttonTerminated)
+    row.addComponents(buttonTerminated)
     row.addComponents(buttonReport)
 
     const starterMessage = await thread.fetchStarterMessage({ force: true })
