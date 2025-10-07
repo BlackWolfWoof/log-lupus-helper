@@ -1,3 +1,4 @@
+// Legacy code. Can be removed in the future
 import { MessageFlags } from 'discord.js';
 import { avatarDb, userDb, countDb, groupDb } from '../../../utils/quickdb.js'
 import { findChannelId } from '../../../utils/functions.js';
@@ -16,6 +17,7 @@ async function execute(interaction) {
       await userDb.delete(entry.id)
       await countDb.add(entry.value.type, 1)
     } else if (entry?.id && entry.id.includes('avtr_')) {
+      // This should not be needed here, as we can check if the user was termed via the avatar 404
       await thread.edit({
         appliedTags: [process.env["DISCORD_AVATAR_TERM_TAG_ID"]]
       })
