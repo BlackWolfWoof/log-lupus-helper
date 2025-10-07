@@ -61,8 +61,8 @@ app.get('/vrchat-report', async (req, res) => {
         redirectUrl = baseUrl +
           urlParams +
           `&tf_41536076540179=accountreport_issue_not_described` +
-          `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%%20%28Automated%20${channelId}%29` +
-          `&tf_description=${encodeURIComponent(`The Avatar in question has adult features, like reproductive organs or genetalia. The attachments may include media showcasing the avatar.<br><br>` +
+          `&tf_subject=%5BAvatar%5D%20NSFW%20Avatar%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.name))}%22%20%28Automated%20${channelId}%29` +
+          `&tf_description=${encodeURIComponent(`The Avatar in question has adult features, like reproductive organs or genitalia. The attachments may include media showcasing the avatar.<br><br>` +
           `Avatar ID: ${entry.id}<br>` +
           `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
           `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
