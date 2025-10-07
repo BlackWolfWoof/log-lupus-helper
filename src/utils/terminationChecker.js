@@ -4,7 +4,7 @@ import { avatarDb, userDb, countDb, groupDb, worldDb } from './quickdb.js'
 import { fromSafeJSON } from './functions.js'
 import { client } from '../discord/bot.js'
 import { EmbedBuilder } from 'discord.js'
-import { getAvatar, getUser, getGroup, getWorld } from './cache.js'
+import { getAvatar, getUser, getGroup, getWorld, getFile } from './cache.js'
 
 async function checkTerminationAvatars() {
   const allAvatars = await avatarDb.all()
@@ -257,6 +257,32 @@ async function checkTerminationGroups() {
 
         continue
       }
+
+      if (group.data?.iconId) {
+        // Group looks ok, icons disapeared. User got punished, group stays
+        const file = await getFile({
+          path: {
+            fileId: group.data.iconId
+          }
+        }, 5, false)
+        if (file.error && file.error.response.status === 404) {
+          const embed2 = new EmbedBuilder()
+            .setTitle('☹️Group and owner punished, but not deletd')
+            .setDescription(`The group and the owner were punished, but the group still exists.\nTherefor the thread is no longer tracked and is archived.`)
+            .setColor(0xFF0000);
+
+          await thread.send({
+            content: submitter,
+            embeds: [embed2]
+          })
+          await thread.edit({
+            appliedTags: [process.env["DISCORD_GROUP_TERM_TAG_ID"]]
+          })
+          await thread.setArchived(true, `Archived automatically (group & owner punish)`);
+          await countDb.add(entry.value.type, 1)
+          await groupDb.delete(entry.id)
+        }
+      }
     } catch (error) {
       logError(`[terminationChecker]: groupDb: ${error}`)
       console.error(error)
@@ -310,7 +336,6 @@ async function checkTerminationWorlds() {
             .setTitle('🛡️User Terminated & World deleted')
             .setDescription(`The world was deleted and the user was most likely terminated.\nTherefor the thread is no longer tracked and is archivd.`)
             .setColor(0xFF0000);
-          embeds.push(embed)
         } else {
           embed = new EmbedBuilder()
             .setTitle('❔User not terminated & world deleted')

@@ -209,3 +209,13 @@ export async function getWorld(object, priority = 5, useCache = true) {
     useCache
   );
 }
+
+export async function getFile(object, priority = 5, useCache = true) {
+  return cachedPriorityQueueFetch(
+    `getFile_${JSON.stringify(object)}`,
+    priority,
+    () => vrchat.getFile(object),
+    3600,
+    useCache
+  );
+}
