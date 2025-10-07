@@ -4,6 +4,18 @@ import { fileURLToPath, pathToFileURL } from 'url';
 import path from 'path';
 import { logDebug, logError } from "./src/utils/logger.js";
 
+// Listen for SIGINT (CTRL+C)
+process.on('SIGINT', () => {
+  console.log('[Main Handler]: Received SIGINT (CTRL+C). Cleaning up...');
+  process.exit(0); // Exit gracefully (replace this when logic for this is in place)
+});
+
+// Listen for SIGTERM (kill command)
+process.on('SIGTERM', () => {
+  console.log('[Main Handler]: Received SIGTERM. Shutting down...');
+  process.exit(0);
+});
+
 // Get the directory of the current file
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -44,15 +56,3 @@ await loadScripts(scriptsPath, scriptsPath);
 import "./src/discord/handler.js"; // Handles command loading
 import "./src/discord/bot.js";     // Handles bot login
 logDebug("[Main Handler]: ✅ All handlers initialized.");
-
-// Listen for SIGINT (CTRL+C)
-process.on('SIGINT', () => {
-  console.log('[Main Handler]: Received SIGINT (CTRL+C). Cleaning up...');
-  process.exit(0); // Exit gracefully (replace this when logic for this is in place)
-});
-
-// Listen for SIGTERM (kill command)
-process.on('SIGTERM', () => {
-  console.log('[Main Handler]: Received SIGTERM. Shutting down...');
-  process.exit(0);
-});
