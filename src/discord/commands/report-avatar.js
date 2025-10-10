@@ -26,7 +26,7 @@ const discord = new SlashCommandBuilder()
         { name: 'Pedophilia', value: 'avatar-pedo' },
         { name: 'NSFW', value: 'avatar-nsfw' },
         { name: 'Promoting Selfharm', value: 'avatar-selfharm' },
-        { name: 'Racist', value: 'avatar-racist' },
+        { name: 'Racist', value: 'avatar-racism' },
         { name: 'Other reason', value: 'avatar-other' },
       )
   );
@@ -36,7 +36,7 @@ const categories = {
   'avatar-pedo': '😻',
   'avatar-nsfw': '🔞',
   'avatar-selfharm': '🩸',
-  'avatar-racist': '🤬',
+  'avatar-racism': '🤬',
   'avatar-other': '❔'
 }
 

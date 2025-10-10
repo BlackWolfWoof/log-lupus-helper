@@ -160,7 +160,7 @@ async function main () {
               { name: '😻 Pedophilia', value: 'avatar-pedo' },
               { name: '🔞 NSFW', value: 'avatar-nsfw' },
               { name: '🩸 Selfharm', value: 'avatar-selfharm' },
-              { name: '🤬 Racist', value: 'avatar-racist' },
+              { name: '🤬 Racist', value: 'avatar-racism' },
               { name: '❔ Other reason', value: 'avatar-other' },
           ];
 
