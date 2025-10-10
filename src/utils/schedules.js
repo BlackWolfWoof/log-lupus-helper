@@ -147,7 +147,7 @@ async function main () {
           for (const entry of allWorlds) {
             if ((entry.value.tickets || []).length !== 0) {
               ticketsOpenWorld++
-              if ((entry.value.tickets || []).length !== 0) {
+              if ((entry.value.tickets || []).length === 0) {
                 ticketsOpenWorldPending++
               }
             }
