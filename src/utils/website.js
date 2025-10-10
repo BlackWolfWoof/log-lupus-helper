@@ -105,7 +105,7 @@ app.get('/vrchat-report', async (req, res) => {
             `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
             `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
         break
-      case "avatar-racist":
+      case "avatar-racism":
         redirectUrl = baseUrl +
           urlParams +
           `&tf_41536076540179=accountreport_issue_not_described` +
@@ -204,7 +204,7 @@ app.get('/vrchat-report', async (req, res) => {
             urlParams +
             `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BUser%5D%20Bad%20Username%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20%28Automated%20${channelId}%29` +
-            `&tf_description=${encodeURIComponent(`I encountered a user with a bad username. This username contains offensive and inappropriate content, including references that violate community standards.<br><br>` +
+            `&tf_description=${encodeURIComponent(`I encountered a user with a bad username. This username contains offensive or inappropriate content, including references that violate community standards.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
             `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
