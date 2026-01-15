@@ -6,3 +6,4 @@ node_modules/
 json.sqlite
 logs/
 data.json
+storageState.json
