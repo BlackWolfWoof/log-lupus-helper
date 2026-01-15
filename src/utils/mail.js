@@ -34,11 +34,11 @@ export async function processNewEmail() {
       // Search for all messages from tickets@vrchat.com
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      const messages = await client.search({ from: 'tickets@vrchat.com', to: 'abusereports@blackwolfwoof.com', sentSince: sevenDaysAgo });
+      const messages = await client.search({ from: 'tickets@vrchat.com', to: process.env["ZENDESK_EMAIL"], sentSince: sevenDaysAgo });
       if (messages.length === 0) {
         logDebug('[email]: No emails found from tickets@vrchat.com');
       } else {
-        logDebug(`[email]: Found ${messages.length} emails from tickets@vrchat.com to abusereports@blackwolfwoof.com`);
+        logDebug(`[email]: Found ${messages.length} emails from tickets@vrchat.com to ${process.env["ZENDESK_EMAIL"]}`);
 
         // Fetch subject and date from each message
         for await (let msg of client.fetch(messages, { envelope: true, source: true })) {
