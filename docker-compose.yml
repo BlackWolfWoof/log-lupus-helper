@@ -15,22 +15,22 @@ services:
     volumes:
       - ./json.sqlite:/app/json.sqlite
       - ./storageState.json:/app/storageState.json
-      - ../shared-auth/loglupus_data.json:/shared-auth/loglupus_data.json
+      - ./login_data.json:/app/login_data.json #../shared-auth/loglupus_data.json:/shared-auth/loglupus_data.json
       - ./logs:/app/logs
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false"
+    #labels:
+    #  - "com.centurylinklabs.watchtower.enable=false"
     networks:
-      - protonmail-bridge
-      - caddy
+    #  - protonmail-bridge
+    #  - caddy
       - prometheus
 
 networks:
-  protonmail-bridge:
-    name: protonmail-bridge
-    external: true
-  caddy:
-    name: caddy
-    external: true
+  #protonmail-bridge:
+  #  name: protonmail-bridge
+  #  external: true
+  #caddy:
+  #  name: caddy
+  #  external: true
   prometheus:
     name: prometheus
     external: true
