@@ -2,10 +2,11 @@ import './loadEnv.js'
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
-import { avatarDb, userDb } from './quickdb.js'
+import { avatarDb, userDb, emailDb } from './quickdb.js'
 import { client as discordClient } from '../discord/bot.js'
 import { convert } from 'html-to-text'
-import { findChannelId, sleep, sha256Hash, addTicket, isTicketHashUsed } from './functions.js'
+import { findChannelId, sleep, sha256Hash, addTicket, isTicketHashUsed, findTicketId } from './functions.js'
+import { scrapeChannelId } from './puppeteer.js';
 
 const client = new ImapFlow({
     host: process.env["IMAP_IP"],
@@ -37,65 +38,74 @@ export async function processNewEmail() {
       if (messages.length === 0) {
         logDebug('[email]: No emails found from tickets@vrchat.com');
       } else {
-        // logDebug(`[email]: Found ${messages.length} emails from tickets@vrchat.com to abusereports@blackwolfwoof.com`);
+        logDebug(`[email]: Found ${messages.length} emails from tickets@vrchat.com to abusereports@blackwolfwoof.com`);
 
         // Fetch subject and date from each message
         for await (let msg of client.fetch(messages, { envelope: true, source: true })) {
           const subject = msg.envelope.subject || '(No Subject)';
           const date = msg.envelope.date;
-          const recipients = msg.envelope.to.map(to => to.address).join(', ');
-          
-          // Check if the email starts with abusereports@blackwolfwoof.com to only include automated reports
-          const regex = /\(Automated (\d{19})\) #\d+$/;
 
-          const match = regex.exec(msg.envelope.subject);
-          if (match) {
-            // Extract the 19-digit number from capture group 1
-            const channelId = match[1];
+          const htmlRegex = /https:\/\/help\.vrchat\.com\/hc\/requests\/(\d+)/
 
-            // Check the email id against the db and skip if already known
-            
-            if (await findChannelId(channelId)) {
-              const emailHash = sha256Hash(`${msg.envelope.date}-${msg.envelope.subject}`)
-              const skipEmail = await isTicketHashUsed(emailHash)
-              if (!skipEmail) {
-                logDebug(`[email]: [${date}] Subject: ${subject}`);
-                // Parse email body
-                const parsed = await simpleParser(msg.source, {
-                  skipImageLinks: true,
-                  skipAttachments: true
-                });
+          const emailHash = sha256Hash(`${date}-${subject}`)
+          const skipEmail = await isTicketHashUsed(emailHash)
 
-                try {
-                  let thread = discordClient.channels.cache.get(channelId);
-                  if (!thread) thread = await discordClient.channels.fetch(channelId);
-                  if (thread.archived) thread.setArchived(false)
-                  // Send email in thread
-                  await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
-                  await thread.edit({
-                    appliedTags: [process.env["DISCORD_USER_TICKET_TAG_ID"], process.env["DISCORD_AVATAR_TICKET_TAG_ID"], process.env["DISCORD_GROUP_TICKET_TAG_ID"], process.env["DISCORD_WORLD_TICKET_TAG_ID"]] // Replace with ticket open tag
-                  })
-                  // Save that we processed the email already
-                  // Save that we now have an email
-                  const entry = await findChannelId(channelId)
-                  await addTicket(entry, emailHash)
-                } catch (error) {
-                  // Delete the entry as the channel no longer exists and i cannot send a message to it anymore
-                  // Figure out if it is a userDb or avatarDb entry
-                  const entry = await findChannelId(channelId)
-                  if (entry?.id && entry.id.includes('usr_')) {
-                    await userDb.delete(entry.id)
-                  } else if (entry?.id && entry.id.includes('avtr_')) {
-                    await avatarDb.delete(entry.id)
-                  } else if (entry?.id && entry.id.includes('grp_')) {
-                    await avatarDb.delete(entry.id)
-                  } else if (entry?.id && entry.id.includes('wrld_')) {
-                    await avatarDb.delete(entry.id)
+          if (!skipEmail) {
+            // Parse email body
+            const parsed = await simpleParser(msg.source, {
+              skipImageLinks: true,
+              skipAttachments: true
+            });
+            const idMatch = htmlRegex.exec(parsed.html)
+            const ticketId = idMatch[1]
+
+            let channelId = await findTicketId(ticketId)
+            const staleEmail = await emailDb.has(emailHash)
+            if (!channelId && !staleEmail) {
+              logDebug(`[email]: [${date}] Subject: ${subject}`);
+              // Scrape channel id from website
+              const scrape = await scrapeChannelId(ticketId)
+              const regex = /\(Automated (\d{19})\)/;
+              const match = regex.exec(scrape)
+              logDebug(`[email <-> zendesk] ${match[1]} belongs to ${ticketId}`)
+              channelId = match[1]
+              if (match) {
+                if (await findChannelId(match[1])) {
+                  try {
+                    let thread = discordClient.channels.cache.get(channelId);
+                    if (!thread) thread = await discordClient.channels.fetch(channelId);
+                    if (thread.archived) thread.setArchived(false)
+                    // Send email in thread
+                    await thread.send(`## ${parsed.subject}\n${convert(parsed.html)}`)
+                    await thread.edit({
+                      appliedTags: [process.env["DISCORD_USER_TICKET_TAG_ID"], process.env["DISCORD_AVATAR_TICKET_TAG_ID"], process.env["DISCORD_GROUP_TICKET_TAG_ID"], process.env["DISCORD_WORLD_TICKET_TAG_ID"]] // Replace with ticket open tag
+                    })
+                    // Save that we processed the email already
+                    // Save that we now have an email
+                    const entry = await findChannelId(channelId)
+                    // if (!entry) new Error(`Entry doesn't exist`)
+                    entry.ticketId = ticketId
+                    await addTicket(entry, emailHash)
+                  } catch (error) {
+                    // Delete the entry as the channel no longer exists and i cannot send a message to it anymore
+                    // Figure out if it is a userDb or avatarDb entry
+                    const entry = await findChannelId(channelId)
+                    if (entry?.id && entry.id.includes('usr_')) {
+                      await userDb.delete(entry.id)
+                    } else if (entry?.id && entry.id.includes('avtr_')) {
+                      await avatarDb.delete(entry.id)
+                    } else if (entry?.id && entry.id.includes('grp_')) {
+                      await avatarDb.delete(entry.id)
+                    } else if (entry?.id && entry.id.includes('wrld_')) {
+                      await avatarDb.delete(entry.id)
+                    }
                   }
+                } else {
+                  await emailDb.set(emailHash, new Date())
+                  logDebug(`[email]: Stale email found: ${emailHash}`)
                 }
               }
             }
-            
           }
         }
       }

@@ -17,5 +17,6 @@ const avatarDb = db.table("avatars")
 const groupDb = db.table("groups")
 const worldDb = db.table("worlds")
 const countDb = db.table("count")
+const emailDb = db.table("emails")
 
-export { avatarDb, userDb, groupDb, worldDb, countDb };
+export { avatarDb, userDb, groupDb, worldDb, countDb, emailDb };

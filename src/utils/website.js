@@ -165,7 +165,7 @@ app.get('/vrchat-report', async (req, res) => {
             urlParams +
             `&tf_41536076540179=accountreport_issue_not_described` +
             `&tf_subject=%5BUser%5D%20%22${encodeURIComponent(sanitizeText(entry.value.vrc.displayName))}%22%20uses%20adult%20avatar%20in%20public%20%20%28Automated%20${channelId}%29` +
-            `&tf_description=${encodeURIComponent(`The user in question is using an avatar with adult features in a none age gated instance. The avatar itself is properly tagged as content_sex. The attachments may include media showcasing the users behavior.<br><br>` +
+            `&tf_description=${encodeURIComponent(`The user in question is using an avatar with adult features in a none age gated instance. The attachments may include media showcasing the users behavior.<br><br>` +
               `Offending User ID: ${entry.id}<br>` +
               `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
               `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;

@@ -355,6 +355,7 @@ export async function addTicket(entry, emailHash) {
 
   // Update and save
   data.tickets = newTickets;
+  data.ticketId = entry.ticketId ?? null
   await db.set(entry.id, data);
 
   logDebug(`[db]: Ticket added to db sucsesfully`)
@@ -662,4 +663,41 @@ export function parseVrChatEmail(title, emailText) {
   }
 
   return [container];
+}
+
+
+export async function findTicketId(ticketId) {
+  // Check avatarDb
+  const avatarEntries = await avatarDb.all();
+  for (const entry of avatarEntries) {
+    if (entry.value && entry.value.ticketId === ticketId) {
+      return entry.value.channelId;
+    }
+  }
+
+  // Check userDb
+  const userEntries = await userDb.all();
+  for (const entry of userEntries) {
+    if (entry.value && entry.value.ticketId === ticketId) {
+      return entry.value.channelId;
+    }
+  }
+
+  // Check groupDb
+  const groupEntries = await groupDb.all();
+  for (const entry of groupEntries) {
+    if (entry.value && entry.value.ticketId === ticketId) {
+      return entry.value.channelId;
+    }
+  }
+
+  // Check worldDb
+  const worldEntries = await worldDb.all();
+  for (const entry of worldEntries) {
+    if (entry.value && entry.value.ticketId === ticketId) {
+      return entry.value.channelId;
+    }
+  }
+
+  return null;
 }

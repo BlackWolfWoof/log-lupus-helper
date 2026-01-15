@@ -3,7 +3,7 @@ import { client } from '../discord/bot.js'
 import { checkTermination } from "./terminationChecker.js";
 import { emailConnection } from './mail.js'
 import { snowflakeOlderThan, findChannelId } from './functions.js'
-import { userDb, avatarDb, groupDb, worldDb, countDb } from './quickdb.js'
+import { userDb, avatarDb, groupDb, worldDb, countDb, emailDb } from './quickdb.js'
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
 
 async function main () {
@@ -277,6 +277,19 @@ async function main () {
         }
       })();
     }, 1800000); // 30min
+
+    setInterval(async () => {
+      const emailDbCache = await emailDb.all()
+      for (const entry of emailDbCache) {
+        const hash = entry.id
+        const past = new Date(entry.value)
+        const future = new Date(Date.now() + 8 * 24 * 60 * 60 * 1000); // 8 days from now
+        if (past > future) {
+          await emailDb.delete(hash)
+          logDebug(`[schedules]: Cleaned stale emailDb entry ${hash}`)
+        }
+      }
+    }, 6 * 60 * 60 * 1000); // 6h
 
   } catch (e) {
     logError(`[schedules]: Fatal error that crashed the loop. Restarting loops. Error: ${e}`)

@@ -1,0 +1,82 @@
+import '../../utils/loadEnv.js'
+import { ContainerBuilder, TextDisplayBuilder, SeparatorBuilder, SeparatorSpacingSize, MediaGalleryBuilder, MediaGalleryItemBuilder, SlashCommandBuilder, ApplicationIntegrationType, InteractionContextType, EmbedBuilder, MessageFlags, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { sendBugMessage, sanitizeText, escapeMarkdown, toTitleCase, getUserTrustLevel, languageMappings, shortenText, parseVrChatEmail } from '../../utils/functions.js';
+import { client } from '../bot.js'
+import { userDb, avatarDb } from '../../utils/quickdb.js'
+import { vrchat } from '../../vrchat/authentication.ts';
+import { getCurrentUser, getAvatar, getUserGroups, getUser } from '../../utils/cache.js'
+
+
+const discord = new SlashCommandBuilder()
+  .setName("example")
+  .setDescription("example")
+  .setIntegrationTypes(ApplicationIntegrationType.GuildInstall)
+  .setContexts(InteractionContextType.Guild)
+
+async function execute(interaction) {
+
+  //   // Example usage
+  // const title = '[VRChat] Trust & Safety Ticket - [Avatar] NSFW Avatar "Succu &lt;3" is missing content_sex tag (Automated 1418675894008021094) #614765';
+  // const emailText = `
+  // [https://assets.vrchat.com/email/VRChatEmailHeader_Trust&Safety.jpg]
+
+  // Hello,
+
+  // Thank you for helping to keep VRChat safe for everyone. We have reviewed your
+  // report and confirmed that it violates our Community Guidelines. Consequently, we
+  // have taken the necessary enforcement action. We appreciate your support in
+  // maintaining a safe environment for all VRChat users.
+  
+  // Thank you
+
+  // VRChat Trust & Safety Team
+
+  // [ZEM73Z-NW99W]
+  // `;
+
+  // const components = parseVrChatEmail(title, emailText)
+  // console.log(JSON.stringify(components, null, 2));
+  // await interaction.reply({
+  //   content: "hello world",
+  //   components: components
+  // })
+  const components = [
+  new ContainerBuilder()
+    .setAccentColor(255)
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent("**[VRChat] Trust & Safety Ticket - [Avatar] NSFW Avatar \"Succu &lt;3\" is missing content_sex tag (Automated 1418675894008021094) #614765**"),
+    )
+    .addSeparatorComponents(
+      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+    )
+    .addMediaGalleryComponents(
+      new MediaGalleryBuilder()
+        .addItems(
+          new MediaGalleryItemBuilder()
+            .setURL("https://assets.vrchat.com/email/VRChatEmailHeader_Trust&Safety.jpg"),
+        ),
+    )
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent("Hello,\n\nThank you for helping to keep VRChat safe for everyone. We have reviewed your\nreport and confirmed that it violates our Community Guidelines. Consequently, we\nhave taken the necessary enforcement action. We appreciate your support in\nmaintaining a safe environment for all VRChat users.\n \nThank you\n\n\n\n\nVRChat Trust & Safety Team\n\n-# [ZEM73Z-NW99W]"),
+    )
+    .addActionRowComponents(
+      new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setLabel("Open Ticket")
+            .setEmoji({
+              name: "🎫",
+            })
+            .setURL("https://google.com"),
+        ),
+    ),
+];
+
+  await interaction.reply({
+    components: components
+  })
+  
+}
+
+export default { discord, execute };

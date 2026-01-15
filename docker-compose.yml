@@ -3,19 +3,26 @@ services:
     container_name: log-lupus-helper
     image: log-lupus-helper
     restart: on-failure:1
+    shm_size: "2gb"
+    stdin_open: true
+    tty: true
+    # ports:
+    #   - "5900:5900"   # VNC port
     build:
       context: .
       dockerfile: Dockerfile
       target: base
     volumes:
-    - ./json.sqlite:/app/json.sqlite
-    - ../shared-auth/loglupus_data.json:/shared-auth/loglupus_data.json
-    - ./logs:/app/logs
+      - ./json.sqlite:/app/json.sqlite
+      - ./storageState.json:/app/storageState.json
+      - ../shared-auth/loglupus_data.json:/shared-auth/loglupus_data.json
+      - ./logs:/app/logs
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     networks:
       - protonmail-bridge
       - caddy
+      - prometheus
 
 networks:
   protonmail-bridge:
@@ -23,4 +30,7 @@ networks:
     external: true
   caddy:
     name: caddy
+    external: true
+  prometheus:
+    name: prometheus
     external: true
