@@ -1,3 +1,4 @@
+import './loadEnv.js'
 import express from 'express';
 import { logDebug, logInfo, logWarn, logError } from './logger.js'
 import { findChannelId, sanitizeText, ReportPrefill } from './functions.js'
@@ -67,7 +68,7 @@ app.get('/vrchat-report', async (req, res) => {
           `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
           `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
           `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
-          `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`
+          `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`
         break
         case "avatar-pedo":
           redirectUrl = baseUrl +
@@ -79,7 +80,7 @@ app.get('/vrchat-report', async (req, res) => {
             `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
             `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
             `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`
         break
       case "avatar-crasher":
         redirectUrl = baseUrl +
@@ -91,7 +92,7 @@ app.get('/vrchat-report', async (req, res) => {
             `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
             `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
             `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
         break
       case "avatar-selfharm":
         redirectUrl = baseUrl +
@@ -103,7 +104,7 @@ app.get('/vrchat-report', async (req, res) => {
             `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
             `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
             `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
         break
       case "avatar-racism":
         redirectUrl = baseUrl +
@@ -115,7 +116,7 @@ app.get('/vrchat-report', async (req, res) => {
             `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
             `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
             `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
         break
       case "avatar-other":
         redirectUrl = baseUrl +
@@ -127,7 +128,7 @@ app.get('/vrchat-report', async (req, res) => {
             `Avatar Name: ${sanitizeText(entry.value.vrc.name)}<br>` +
             `Avatar Owner ID: ${entry.value.vrc.authorId}<br>` +
             `Avatar Owner Name: ${sanitizeText(entry.value.authorDisplayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
         break
       default:
         return res.status(400).send({
@@ -158,7 +159,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`The user in question is using offensive/racist language. The attachments may include media showcasing the users behavior.<br><br>` +
               `Offending User ID: ${entry.id}<br>` +
               `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'nsfw':
           redirectUrl = baseUrl +
@@ -168,7 +169,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`The user in question is using an avatar with adult features in a none age gated instance. The attachments may include media showcasing the users behavior.<br><br>` +
               `Offending User ID: ${entry.id}<br>` +
               `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'child':
           redirectUrl = baseUrl +
@@ -178,7 +179,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`The user in question is under the legal age of 13 to play VRChat. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'pedo':
           redirectUrl = baseUrl +
@@ -188,7 +189,7 @@ app.get('/vrchat-report', async (req, res) => {
               `&tf_description=${encodeURIComponent(`I encountered a user exhibiting predatory behavior toward minors in VRChat. They made inappropriate comments and attempted to engage in grooming behavior. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
               `Offending User ID: ${entry.id}<br>` +
               `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'media':
           redirectUrl = baseUrl +
@@ -197,7 +198,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`I encountered a user uploading and posting inappropriate media to the platform. The attachments may include media showcasing the users behavior and media they uploaded.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'badusername':
           redirectUrl = baseUrl +
@@ -207,7 +208,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`I encountered a user with a bad username. This username contains offensive or inappropriate content, including references that violate community standards.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'selfharm':
           redirectUrl = baseUrl +
@@ -216,7 +217,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`I encountered a user threatening or promoting self-harm. The attachments may include media showcasing the users and voice as well as other evidence.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'crasher':
           redirectUrl = baseUrl +
@@ -226,7 +227,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`The User in question disrupts the gameplay by crashing/lagging the client of the users. The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'other':
           redirectUrl = baseUrl +
@@ -235,7 +236,7 @@ app.get('/vrchat-report', async (req, res) => {
             `&tf_description=${encodeURIComponent(`The attachments may include media showcasing the users behavior and voice as well as other evidence.<br><br>` +
             `Offending User ID: ${entry.id}<br>` +
             `Offending User Name: ${sanitizeText(entry.value.vrc.displayName)}<br><br>` +
-            `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+            `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         default:
           return res.status(400).send({
@@ -285,7 +286,7 @@ app.get('/vrchat-report', async (req, res) => {
               `Group Name: ${sanitizeText(group.data.name)}<br>` +
               `Owner ID: ${group.data.ownerId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'pedo':
           redirectUrl = baseUrl +
@@ -297,7 +298,7 @@ app.get('/vrchat-report', async (req, res) => {
                 `Group Name: ${sanitizeText(group.data.name)}<br>` +
                 `Owner ID: ${group.data.ownerId}<br>` +
                 `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-                `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+                `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'media':
           redirectUrl = baseUrl +
@@ -309,7 +310,7 @@ app.get('/vrchat-report', async (req, res) => {
               `Group Name: ${sanitizeText(group.data.name)}<br>` +
               `Owner ID: ${group.data.ownerId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'selfharm':
           redirectUrl = baseUrl +
@@ -321,7 +322,7 @@ app.get('/vrchat-report', async (req, res) => {
               `Group Name: ${sanitizeText(group.data.name)}<br>` +
               `Owner ID: ${group.data.ownerId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'badgroupname':
           redirectUrl = baseUrl +
@@ -333,7 +334,7 @@ app.get('/vrchat-report', async (req, res) => {
               `Group Name: ${sanitizeText(group.data.name)}<br>` +
               `Owner ID: ${group.data.ownerId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'crasher':
           redirectUrl = baseUrl +
@@ -345,7 +346,7 @@ app.get('/vrchat-report', async (req, res) => {
               `Group Name: ${sanitizeText(group.data.name)}<br>` +
               `Owner ID: ${group.data.ownerId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'other':
           redirectUrl = baseUrl +
@@ -357,7 +358,7 @@ app.get('/vrchat-report', async (req, res) => {
               `Group Name: ${sanitizeText(group.data.name)}<br>` +
               `Owner ID: ${group.data.ownerId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         default:
           return res.status(400).send({
@@ -406,7 +407,7 @@ app.get('/vrchat-report', async (req, res) => {
               `Wroup Name: ${sanitizeText(world.data.name)}<br>` +
               `Owner ID: ${world.data.authorId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'pedo':
           redirectUrl = baseUrl +
@@ -418,7 +419,7 @@ app.get('/vrchat-report', async (req, res) => {
                 `World Name: ${sanitizeText(world.data.name)}<br>` +
                 `Owner ID: ${world.data.authorId}<br>` +
                 `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-                `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+                `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'media':
           redirectUrl = baseUrl +
@@ -430,7 +431,7 @@ app.get('/vrchat-report', async (req, res) => {
               `World Name: ${sanitizeText(world.data.name)}<br>` +
               `Owner ID: ${world.data.authorId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'selfharm':
           redirectUrl = baseUrl +
@@ -442,7 +443,7 @@ app.get('/vrchat-report', async (req, res) => {
               `World Name: ${sanitizeText(world.data.name)}<br>` +
               `Owner ID: ${world.data.authorId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'badworldname':
           redirectUrl = baseUrl +
@@ -454,7 +455,7 @@ app.get('/vrchat-report', async (req, res) => {
               `World Name: ${sanitizeText(world.data.name)}<br>` +
               `Owner ID: ${world.data.authorId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'crasher':
           redirectUrl = baseUrl +
@@ -466,7 +467,7 @@ app.get('/vrchat-report', async (req, res) => {
               `World Name: ${sanitizeText(world.data.name)}<br>` +
               `Owner ID: ${world.data.authorId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         case 'other':
           redirectUrl = baseUrl +
@@ -478,7 +479,7 @@ app.get('/vrchat-report', async (req, res) => {
               `World Name: ${sanitizeText(world.data.name)}<br>` +
               `Owner ID: ${world.data.authorId}<br>` +
               `Owner Name: ${sanitizeText(user.data.displayName)}<br><br>` +
-              `<b>This is a semi automated report. For issues please contact wolf@blackwolfwoof.com</b>`)}`;
+              `<b>This is a semi automated report. For issues please contact ${process.env["ZENDESK_EMAIL"]}</b>`)}`;
           break
         default:
           return res.status(400).send({

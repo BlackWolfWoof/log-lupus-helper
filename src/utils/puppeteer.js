@@ -21,7 +21,7 @@ async function saveStorageState(page, filePath) {
   const cookies = await page.cookies();
   const state = { cookies };
   fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
-  console.log('✅ Cookies saved to', filePath);
+  logInfo('[puppeteer]: ✅ Cookies saved to', filePath);
 }
 
 /**

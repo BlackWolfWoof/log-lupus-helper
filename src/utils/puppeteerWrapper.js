@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import { execSync } from 'child_process';
+import { logDebug, logWarn } from './logger.js'
 import fs from 'fs';
 
 function hasXvfb() {
@@ -28,15 +29,15 @@ function getChromiumPath() {
 export async function launchSmartPuppeteer() {
   const executablePath = getChromiumPath();
   if (!executablePath) {
-    console.warn('[puppeteer-wrapper] WARNING: No system Chromium found, relying on default Puppeteer Chromium.');
+    logWarn('[puppeteer-wrapper]: WARNING: No system Chromium found, relying on default Puppeteer Chromium.');
   }
 
   const hasDisplay = hasXServer();
   const xvfbRunning = hasXvfb();
 
-  console.log(`[puppeteer-wrapper] DISPLAY: ${process.env.DISPLAY || 'none'}`);
-  console.log(`[puppeteer-wrapper] Xvfb running: ${xvfbRunning}`);
-  console.log(`[puppeteer-wrapper] X server available: ${hasDisplay}`);
+  logDebug(`[puppeteer-wrapper]: DISPLAY: ${process.env.DISPLAY || 'none'}`);
+  logDebug(`[puppeteer-wrapper]: Xvfb running: ${xvfbRunning}`);
+  logDebug(`[puppeteer-wrapper]: X server available: ${hasDisplay}`);
 
   let headlessMode = false;
   let args = [
@@ -49,10 +50,10 @@ export async function launchSmartPuppeteer() {
 
   // If no X server, force headless mode
   if (!hasDisplay && !xvfbRunning) {
-    console.warn('[puppeteer-wrapper] ⚠️ No X server detected — forcing headless mode.');
+    logWarn('[puppeteer-wrapper]: ⚠️ No X server detected — forcing headless mode.');
     headlessMode = 'new';
   } else {
-    console.log('[puppeteer-wrapper] 🖥️ X server detected — running in full headful mode.');
+    logInfo('[puppeteer-wrapper]: 🖥️ X server detected — running in full headful mode.');
   }
 
   return puppeteer.launch({
