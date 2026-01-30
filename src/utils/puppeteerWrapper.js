@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer';
 import { execSync } from 'child_process';
-import { logDebug, logWarn } from './logger.js'
+import { logDebug, logInfo, logWarn } from './logger.js'
 import fs from 'fs';
 
 function hasXvfb() {
