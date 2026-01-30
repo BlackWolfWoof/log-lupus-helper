@@ -72,21 +72,35 @@ export async function scrapeChannelId(requestId) {
     let currentUrl = page.url();
 
   // If redirected to login page, perform login
-  if (currentUrl.startsWith('https://help.vrchat.com/auth/v3/signin')) {
-    logInfo(`[puppeteer]: 🔐 Expired / no login cookie, redirected to login page, attempting login...`);
+  if (currentUrl.includes('/auth/')) {
+    logInfo(`[puppeteer]: 🔐 Redirected to login page, attempting login...`);
 
-    // Wait for React inputs to mount
-    await page.waitForSelector('[data-testid="email-input"]', { visible: true });
-    await page.waitForSelector('[data-testid="password-input"]', { visible: true });
+    // Wait for login form to fully mount
+    await page.waitForSelector('[data-testid="login-form"]', { visible: true });
 
-    // Type credentials (React-safe)
-    await page.type('[data-testid="email-input"]', process.env["ZENDESK_EMAIL"], { delay: 50 });
-    await page.type('[data-testid="password-input"]', process.env["ZENDESK_PASSWORD"], { delay: 50 });
+    const emailSelector = '[data-testid="email-input"]';
+    const passwordSelector = '[data-testid="password-input"]';
+    const submitSelector = '[data-testid="submit-button"]';
 
-    // Submit + wait for navigation
+    await page.waitForSelector(emailSelector, { visible: true });
+    await page.waitForSelector(passwordSelector, { visible: true });
+
+    // Clear + type email
+    await page.click(emailSelector, { clickCount: 3 });
+    await page.keyboard.press('Backspace');
+    await page.keyboard.type(process.env.ZENDESK_EMAIL, { delay: 40 });
+
+    // Clear + type password
+    await page.click(passwordSelector, { clickCount: 3 });
+    await page.keyboard.press('Backspace');
+    await page.keyboard.type(process.env.ZENDESK_PASSWORD, { delay: 40 });
+
+    // Submit and wait for redirect away from auth
     await Promise.all([
-      page.click('[data-testid="submit-button"]'),
-      page.waitForNavigation({ waitUntil: 'domcontentloaded' })
+      page.click(submitSelector),
+      page.waitForNavigation({
+        waitUntil: 'domcontentloaded',
+      }),
     ]);
 
     // Save cookies after successful login
@@ -95,7 +109,9 @@ export async function scrapeChannelId(requestId) {
     // Return to original URL
     logInfo(`[puppeteer]: ↩️ Returning to original request page...`);
     await page.goto(url, { waitUntil: 'domcontentloaded' });
-    await sleep(10000);
+
+    // Wait for the actual request page to render
+    await page.waitForSelector('main h1', { timeout: 15000 });
 
     currentUrl = page.url();
   }
